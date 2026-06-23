@@ -18,11 +18,11 @@ export class LLM {
                     if (!process.env.FIRE_WORKS_API_KEY) {
                         throw new Error("FIRE_WORKS_API_KEY is not set")
                     }
-                    LLM.instances[type] = new ChatFireworks({
-model: "accounts/fireworks/models/qwen3-v1-30b-a3b-thinking",
-temperature: 0.7,
-apiKey: process.env.FIRE_WORKS_API_KEY
-                    });
+                   LLM.instances[type] = new ChatFireworks({
+  model: "accounts/fireworks/models/gpt-oss-120b",
+  temperature: 0.7,
+  apiKey: process.env.FIRE_WORKS_API_KEY
+});
                     break;
 
                 case "cerebras":

@@ -61,7 +61,7 @@ async function createChildDocs(props: {parentDocs:Document[], userId: string}) {
 
 
 
-export async function docEmbeddinMultiVector(props: {allDocs:Document[], userId: string}) {
+export async function docEmbeddingMultiVector(props: {allDocs:Document[], userId: string}) {
     const {allDocs, userId}=props
     const embeddings = new CohereEmbeddings({
         model: "embed-english-v3.0",
