@@ -2,6 +2,7 @@ import {promises as fs} from "node:fs";
 import path from "node:path";
 import {tool} from "@langchain/core/tools";
 import {z} from "zod";
+import { UserData } from "../MemoryManager";
 
 
 function resolveSafePath(rootDir: string, relativePath:string) {
@@ -59,7 +60,7 @@ export async function appendAFile(rootDir:string, relativePath:string, content:s
     return `Append file: ${relativePath}`;
 }
 
-export function buildFileSystemTools(memoryRoot:string) {
+export function buildFileSystemTools(memoryRoot:string, userData:UserData) {
 
 
     const createFileTool = tool(
@@ -142,7 +143,7 @@ const now = new Date()
 const farmattedDate = now.toTimeString().slice(0, 8);
 const memoryContent = `## [Time: ${farmattedDate}] \n${content}\n\n`;
 try {
-    return appendAFile(memoryRoot, 'MEMORY.md', memoryContent);
+    return appendAFile(memoryRoot, `MEMORY-${userData.userId}.md`, memoryContent);
 } catch (error) {
     return JSON.stringify({message: "File you're trying to read doesn't exist"})
 }

@@ -5,16 +5,18 @@ import {v4 as uuidv4} from "uuid"
 import fs from 'fs'
 import { TruckElectricIcon } from "lucide-react";
 const ROOT = process.cwd();
-const CHAT_HISTORY_DIR = path.join(ROOT, "public", "threads")
+const THREAD_HISTORY_FILE = path.join(ROOT, "public", "threads")
+const HISTORY_FOLDER = path.join(ROOT, 'public', 'chat-history')
 
-
-if (!fs.existsSync(CHAT_HISTORY_DIR)) {
-    fs.mkdirSync(CHAT_HISTORY_DIR, {recursive: true});
+if (!fs.existsSync(THREAD_HISTORY_FILE)) {
+    fs.mkdirSync(THREAD_HISTORY_FILE, {recursive: true});
 
 }
 
 
-const HISTORY_FILE = path.join(CHAT_HISTORY_DIR, "threads.json")
+const THREAD_FILE = path.join(THREAD_HISTORY_FILE, "threads.json")
+
+const HISTORY_FILE = path.join(HISTORY_FOLDER, "chat-history.json")
 
 
 export const threadSchema = z.object({
@@ -189,7 +191,7 @@ export const getAllThreadsByUserTool = tool(
         const threads = JSON.parse(data);
 
         let userThreads = threads.filter(
-            (t:any) => t.userId === userId
+            (t:any) => t.userId === userId && !("role" in t)
         );
 
 
@@ -205,18 +207,12 @@ export const getAllThreadsByUserTool = tool(
            fs.writeFileSync(HISTORY_FILE, JSON.stringify(threads, null,2));
            userThreads = [newThread]
         }
-        let activeThread = userThreads.find((t :any) => t.active);
-        if (!activeThread) {
-activeThread = userThreads[0];
-activeThread.active = true;
-
-
-
-const index = threads.findIndex((t: any) => t.id === activeThread!.id);
-if (index >= 0) threads[index] = activeThread;
-
-fs.writeFileSync(HISTORY_FILE, JSON.stringify(threads, null,2));
-        }
+       let activeThread = userThreads.find((t: any) => t.active);
+if (!activeThread) {
+    activeThread = userThreads[0];
+    activeThread.active = true; // already mutates the same object inside `threads`
+    fs.writeFileSync(HISTORY_FILE, JSON.stringify(threads, null, 2));
+}
 return {
     threads: userThreads,
     redirectThreadId: activeThread.threadId,
@@ -239,5 +235,81 @@ return {
 userId: z.string(),
         })
 
+    }
+);
+
+
+
+
+export const generateThreadTitleTool = tool(
+    async({userId, threadId, llm}:any) => {
+        try {
+          if (!fs.existsSync(HISTORY_FILE)) {
+            return false
+          } 
+          const historyRaw = fs.readFileSync(HISTORY_FILE, 'utf-8');
+          const history = JSON.parse(historyRaw);
+        const historyMessages = history.filter(
+            (m:any) => m.userId === userId && m.threadId === threadId
+        );
+
+        if (historyMessages.length ===3) {
+            const firstTwo = historyMessages.slice(0,2).map((m:any) => `role:${m.role} content:${m.content}`)
+            .join("\n");
+if (!firstTwo) {
+    return false
+}
+            const response = await llm.invoke([
+                {
+                    role: "system",
+                    content:
+                    "Generate a very short (3-6 words) title, summarizing this conversation. "
+                },
+                {
+                    role: "user",
+                    content: firstTwo
+                },
+            ]);
+            const generatedTitle = response.content.trim();
+            const threadsRaw = fs.readFileSync(THREAD_FILE, "utf-8");
+            const threads = JSON.parse(threadsRaw);
+
+            const updatedThreads = threads.map((t:any) => {
+                if (t.threadId === threadId && t.userId === userId) {
+                    return {...t, title: generatedTitle};
+                }
+                return t;
+            });
+
+
+            fs.writeFileSync(
+                THREAD_FILE,
+JSON.stringify(updatedThreads, null,2),
+'utf-8'
+            );
+
+            console.log(`Thread title updated to:${generatedTitle}`);
+
+            
+            return true;
+        }
+
+        return false
+        } catch (error) {
+console.error("Title generation error:",error);
+return "Failed to generate thread title."
+        }
+    },
+    {
+        name: "GenerateThreadTitle",
+        description:
+        "Generate a short conversation title based on first two user messages and update title",
+        schema: z.object({
+           
+                userId: z.string(),
+                threadId: z.string(),
+                llm: z.any(),
+            
+        })
     }
 )

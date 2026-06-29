@@ -1,7 +1,8 @@
 import { Document } from "langchain";
-import { MemoryManager } from "./MemoryManaget";
+import { MemoryManager, UserData } from "./MemoryManager";
 import { compressSTMTool } from "./tools/STMCompressorTools";
 import { docEmbeddingMultiVector, queryMultiVector } from "./stores/multi-vector";
+import { bm25Retriever, formatDocumentAsString } from "./stores/BM25";
 
 
 
@@ -13,21 +14,30 @@ function estimateTokens(text:string) {
 export class ContextAssembler {
     private memory:MemoryManager
     private modelContextLimit:number
+    private userData: UserData
 
-    constructor(memoryManager:MemoryManager, modelContextLimit:number) {
+    constructor(memoryManager:MemoryManager, modelContextLimit:number, userData:UserData) {
         this.memory = memoryManager;
         this.modelContextLimit = modelContextLimit
+        this.userData=userData
     }
 
 
     async assemble(userQuery:string, options={}) {
-        const systemPrompt = await this.memory.readMemoryFiles("system_prompt.md");
-        const userProfile = await this.memory.readMemoryFiles("MEMORY.md");
+        const systemPrompt = await this.memory.readMemoryFiles(`system_prompt-${this.userData.userId}.md`);
+        const userProfile = await this.memory.readMemoryFiles(`MEMORY-${this.userData.userId}.md`);
         const todayLog = await this.memory.readToday(new Date());
 
-        let relevantLongTermMemory = null
+        let relevantLongTermMemory = ''
 const archiveLog = await this.memory.readArchiveFile();
-const vectorData = await queryMultiVector({userId: 'ben-memo-1230009', query: userQuery})
+const vectorData = await queryMultiVector({userId: this.userData.userId, query: userQuery})
+const docToString = formatDocumentAsString(vectorData?.retrieveDocs)
+relevantLongTermMemory+= `\n\n#<data_retrieved_from_vector_db> \n${docToString}\n\n</data_retrieved_from_vector_db>`
+if (archiveLog.exist) {
+    const bm25Data = await bm25Retriever(archiveLog?.data as string, userQuery)
+    relevantLongTermMemory += `\n\n#<data_retrieved_from_daily_log_arhive> ${bm25Data}<data_retrieved_from_daily_log_arhive>`
+}
+console.log('relevantLongTermMemory. :::', relevantLongTermMemory)
         const fixedLayers = [
             `# System Layer\n${systemPrompt}`,
             `# Profile Layer\n${userProfile}`,
@@ -50,7 +60,7 @@ const docToEmbed = new Document({
 })
 
 await docEmbeddingMultiVector({
-userId: "ben-memo-123009",
+userId: this.userData.userId,
 allDocs: [docToEmbed]
 })
 
