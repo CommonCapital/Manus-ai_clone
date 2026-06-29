@@ -1,26 +1,56 @@
 [
   {
+    "userId": "6a3428959fe2496b8a953283",
+    "threadId": "277791ea-1340-47cf-bca1-5f39c9a7bdb2",
+    "title": "New Threads",
+    "active": false,
+    "createdAt": "2026-06-24T20:30:44.292Z"
+  },
+  {
+    "userId": "6a3428959fe2496b8a953283",
+    "threadId": "8c7a18e6-97ac-4407-a122-8ed1ae18ac52",
+    "title": "New Threads",
+    "active": false,
+    "createdAt": "2026-06-24T20:30:45.160Z"
+  },
+  {
+    "userId": "6a3428959fe2496b8a953283",
+    "threadId": "5c797575-02d2-4060-9418-c0e5cc9db381",
+    "title": "New Threads",
+    "active": true,
+    "createdAt": "2026-06-24T20:58:14.355Z"
+  },
+  {
     "role": "user",
     "userId": "6a3428959fe2496b8a953283",
-    "threadId": "1affc781-ede9-4355-b432-97ec88ba2a1b",
+    "threadId": "277791ea-1340-47cf-bca1-5f39c9a7bdb2",
     "content": "Hi"
   },
   {
+    "role": "ai",
+    "userId": "6a3428959fe2496b8a953283",
+    "threadId": "277791ea-1340-47cf-bca1-5f39c9a7bdb2",
+    "content": "Hello! How can I assist you today?",
+    "thinking": ""
+  },
+  {
     "role": "user",
     "userId": "6a3428959fe2496b8a953283",
-    "threadId": "1affc781-ede9-4355-b432-97ec88ba2a1b",
+    "threadId": "277791ea-1340-47cf-bca1-5f39c9a7bdb2",
     "content": "How are u"
   },
   {
-    "role": "user",
+    "role": "ai",
     "userId": "6a3428959fe2496b8a953283",
-    "threadId": "1affc781-ede9-4355-b432-97ec88ba2a1b",
-    "content": "Hey"
+    "threadId": "277791ea-1340-47cf-bca1-5f39c9a7bdb2",
+    "content": "I'm doing great, thanks for asking! How can I help you today?",
+    "thinking": ""
   },
   {
-    "role": "user",
-    "userId": "6a3428959fe2496b8a953283",
-    "threadId": "6cd34578-e6b7-4c28-93b8-ebe45fbf3fa2",
-    "content": "Hi, how are you"
+    "threadId": "d290dd9d-e717-42cb-b1c4-7d277f4872ec",
+    "userId": "6a3428bc9fe2496b8a953284",
+    "title": "New Thread",
+    "createdAt": "2026-06-24T22:48:18.920Z",
+    "active": true
   }
 ]

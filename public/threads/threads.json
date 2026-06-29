@@ -54,5 +54,19 @@
     "title": "New Threads",
     "active": true,
     "createdAt": "2026-06-18T18:06:05.583Z"
+  },
+  {
+    "threadId": "d2bf127a-25f2-492a-90f3-09be5da64375",
+    "userId": "6a3428bc9fe2496b8a953284",
+    "title": "New Thread",
+    "createdAt": "2026-06-23T14:43:03.845Z",
+    "active": false
+  },
+  {
+    "userId": "6a3428bc9fe2496b8a953284",
+    "threadId": "9b5068a6-ca50-4ae0-bc98-7c15e29186cb",
+    "title": "New Threads",
+    "active": true,
+    "createdAt": "2026-06-23T14:45:39.391Z"
   }
 ]

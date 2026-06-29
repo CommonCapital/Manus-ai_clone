@@ -9,7 +9,7 @@ import { ChatMessage } from '@/lib/api/threads';
 export const MessageBubble = memo(function MessageNunnle({
     message, loading
 }: {
-    message: ChatMessage[];
+    message: ChatMessage;
     loading: boolean;
 }) {
 

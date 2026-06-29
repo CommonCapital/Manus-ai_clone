@@ -8,6 +8,7 @@ import { ChatInput } from "./chatbox/ChatInput";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/store";
 import { addUserAndAiPlaceholder, appendToAssistantThinking, appendToLoastAiMessage, getChatHistory } from "@/store/chatSlice";
+import { fetchThreads } from "@/store/threadSlice";
 export default function ChatPanel({userId, threadId}: {userId: string, threadId:string}) {
     const [input, setInput] = useState("");
     const [loading, setLoading] = useState(false);
@@ -79,7 +80,7 @@ const sendMessage = async () => {
 
     try {
         setLoading(true)
-        const res = await fetch("/api/agent/streams", {
+        const res = await fetch("/api/agent/streams/v1", {
             method: "POST",
             headers: {
                 "Content-Type":"application/json",
@@ -134,6 +135,12 @@ if (!thinkingTypingRef.current) {
 
                 else if (trimmed.startsWith("event:")) {
                     const eventType = trimmed.replace("event:", "").trim();
+
+                    if (eventType === "updateThread" ) {
+                        if (userId) {
+                            dispatch(fetchThreads(userId))
+                        }
+                    }
 
 
                     if (eventType === "end") {

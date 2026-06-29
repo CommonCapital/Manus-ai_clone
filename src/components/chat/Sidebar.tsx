@@ -5,11 +5,12 @@ import { cn } from '@/lib/utils';
 import { AppDispatch, RootState } from '@/store';
 import { fetchThreads } from '@/store/threadSlice';
 
-import { FileText, MessageSquare, Plus } from 'lucide-react';
+import { FileText, MessageSquare, PanelLeftClose, PanelRightClose, Plus } from 'lucide-react';
 import { signOut, useSession } from 'next-auth/react';
 import { useParams, useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
+import AccountButton from '../accounts/AccountButton';
 
 export default function Sidebar ()  {
 
@@ -90,8 +91,21 @@ threads?.map((thread) => (
 ))
 )}
 </nav>
+<div className='mt-auto pt-4'>
+<AccountButton />
+</div>
 </div>
 </aside>
+
+<div className='pt-7 cursoir-pointer pl-3'>
+    <button
+    onClick={() => setMenuOpen(!menuOpen)}
+    className='rounded-md text-slate-500 hover:bg-slate-200 cursor-pointer'
+    title={menuOpen ? "Close Sidebar":"Open Sidebar"}
+    >
+{menuOpen ? (<PanelLeftClose size={24}/>):(<PanelRightClose size={24} />)}
+    </button>
+</div>
     </div>
   )
 }
