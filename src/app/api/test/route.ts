@@ -12,7 +12,7 @@ export async function GET(req:Request) {
     try {
 const llm = LLM.getInstance("fireworks")
 
-await TestDeepAgent()
+await TestDeepAgent("test message", { writer: (data: any) => console.log("test writer:", data) })
      return NextResponse.json(
         {message: "test created"}
      );

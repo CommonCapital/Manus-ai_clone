@@ -4,6 +4,7 @@ import { ChevronDown, ChevronRight, Loader2 } from 'lucide-react';
 import {memo, useState} from 'react';
 import { ConvertMarkdownToText } from './ConvertMarkdownToText';
 import { ChatMessage } from '@/lib/api/threads';
+import { SubAgentVerticalUI } from './agent-ui/SubAgentVerticalUI';
 
 
 export const MessageBubble = memo(function MessageNunnle({
@@ -76,6 +77,7 @@ Thinking
     </p>
 ):(
     <div className="prose prose-sm max-w-none leading-relaxed">
+        <SubAgentVerticalUI agents={message?.sub_agent} />
         <ConvertMarkdownToText text={message.content} />
     </div>
 )}

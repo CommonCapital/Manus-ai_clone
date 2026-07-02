@@ -4,6 +4,7 @@ import { MemoryManager } from "./MemoryManager";
 import { buildFileSystemTools } from "./tools/fileSystemTools";
 import { MEMORY_AGENT_SYSTEM_PROMT } from "./prompt/system-prompt";
 import { ContextAssembler } from "./contextAssembler";
+import { write_todos } from "../deepAgent/todoTools";
 
 
 
@@ -74,35 +75,35 @@ return stream
 
 }
 async function streamAgentV1(userInput:string, config:any) {
-await memoryManager.logInteraction("User", userInput, new Date());
+    await memoryManager.logInteraction("User", userInput, new Date());
+    const assembled = await contextAssembler.assemble(userInput, {});
+    const agentStream = await agent.stream(
+        {messages: [{role: "user", content: assembled?.prompt}]},
+        {streamMode: "messages"}
+    )
+    let rawContent = "";     // raw — for routing, includes __TRANSFER__
+    let logContent = "";     // clean — for memory logging only
 
-const assembled = await contextAssembler.assemble(userInput, {});
+    for await (const [messageChunk, metadata] of agentStream) {
+        if (messageChunk.content && messageChunk._getType() === "ai") {
+            const text = messageChunk.content as string;
+            rawContent += text;  // accumulate raw
 
-const agentStream = await agent.stream(
-    {messages: [{role: "user", content: assembled?.prompt}]},
-    {streamMode: "messages"}
-)
+            const cleanText = text
+                .replace(/<think>[\s\S]*?<\/think>/g, "")
+                .replace(/__TRANSFER__[^\n]*/g, "")
+                .trim();
+            if (cleanText) logContent += cleanText;
 
-
-
-let fullContent = "";
-
-for await (const [messageChunk, metadata ] of agentStream) {
-    if (messageChunk.content) {
-        const text = messageChunk.content;
-        fullContent += text;
-
-        config.writer({
-            manager_name: "nodeA",
-            content:text,
-        })
+            config.writer({manager_name: "nodeA", content: text})
+        }
     }
-}
 
-await memoryManager.logInteraction("Assistant", fullContent, new Date());
+    if (logContent) {
+        await memoryManager.logInteraction("Assistant", logContent, new Date());
+    }
 
-
-return fullContent
+    return rawContent;  // return raw so nodeA can detect __TRANSFER__
 }
 async function logLastAIMsg(fullAssistantText:string) {
     await memoryManager.logInteraction("Assitant-1", fullAssistantText, new Date());

@@ -28,7 +28,7 @@ export const POST = withErrorHandler(async (req: Request) => {
         const encoder = new TextEncoder();
 
         const sse = (event:string, data:any) => {
-            encoder.encode(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`);
+           return encoder.encode(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`);
 
 
         }
@@ -42,6 +42,27 @@ export const POST = withErrorHandler(async (req: Request) => {
         async start(controller) {
             try {
                for await (const [array,chunk] of graphStream) {
+
+if ((chunk as any).update_todos) {
+    const update_todo = {
+        todos: chunk?.todos,
+        updates: chunk?.updates
+    };
+    controller.enqueue(sse("update_todos",{
+        update_todo
+    }));
+}
+
+if ((chunk as any).todos) {
+    console.log('todos ==========',chunk)
+    const todo_list = {
+        todos:chunk?.todos,
+        todoList: chunk?.todoList
+    };
+    controller.enqueue(sse("todo_list", {
+        todo_list
+    }));
+}
                 if ((chunk as any).subagent_name) {
                     const name = (chunk as any)?.subagent_name
                     const content = (chunk as any)?.content;

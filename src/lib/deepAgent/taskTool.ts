@@ -3,7 +3,7 @@ import {z} from "zod";
 import { SystemMessage, HumanMessage } from "langchain";
 import {DEFAULT_SUBAGENT_PROMPT, getTaskToolDescription} from "./prompts";
 
-import { resolveMultipleLabels } from "@base-ui/react/internals/resolveValueLabel";
+
 import { toolMonitoringMiddleware, ToolOutputSummarizerMiddleware } from "./middleware";
 
 const taskToolDescription = getTaskToolDescription()

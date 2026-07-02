@@ -35,7 +35,7 @@ const StoredTaskSchema = z.object({
 });
 
 export const write_todos = tool(
-    async ({filename, todos}) => {
+    async ({filename, todos}, toolConfig:any) => {
         try {
             await fs.promises.mkdir(BASE_DIR, {recursive:true});
             const readFileName = `${filename}.todos.json`
@@ -53,17 +53,22 @@ export const write_todos = tool(
                 updated_at: now,
             })) ;
 
-
+const jsonStringTodos = JSON.stringify(enriched, null, 2)
             await fs.promises.writeFile(
                 filePath,
-                JSON.stringify(enriched, null, 2),
+                jsonStringTodos,
                 "utf8"
             );
 
-            return {
-                message: `TODO list saved file name: ${readFileName}`,
-                tasks: enriched
-        }
+            toolConfig.writer({
+                todos: "todos",
+                todoList: jsonStringTodos
+            })
+
+            return `<think>${JSON.stringify({
+    message: `TODO list saved file name: ${readFileName}`,
+    tasks: enriched
+})}</think>`
         } catch(error:any) {
             return `Error writing TODO list: ${error.message}`
         }
@@ -125,7 +130,7 @@ const raw = await fs.promises.readFile(filePath, "utf8");
 const todos = JSON.parse(raw)
 return JSON.stringify(todos, null, 2);
         } catch(error:any) {
-return `Error reading TODO list: ${error.message}`
+return `<think>Error reading TODO list: ${error.message}</think>`
         }
     },
     {
@@ -138,7 +143,7 @@ return `Error reading TODO list: ${error.message}`
 );
 
 export const update_todos = tool(
-    async ({filename, updates}) => {
+    async ({filename, updates}, toolConfig:any) => {
         try {
             const filePath = path.join(BASE_DIR, filename);
 
@@ -164,8 +169,12 @@ if (index !==-1) {
                 filePath,
                 JSON.stringify(todos, null, 2),
                 "utf8"
-            )
-            return "TODO list updated successfully."
+            );
+            toolConfig.writer({
+                update_todos: "update_todos",
+                updates:updates
+            })
+            return "<think>TODO list updated successfully.</think>"
         } catch (error:any) {
             return `Error updating TODO list: ${error.message}`
         }

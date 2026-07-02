@@ -23,7 +23,7 @@ async function loadRawDocs(allDocs: Document[]) {
         return parentSplits.map((split) => {
             const chunkId = uuidv4();
             split.metadata.docType = "parent";
-            split.metadata.chunkid = chunkId;
+            split.metadata.chunkId = chunkId;
             split.metadata.parentId = chunkId;
             split.metadata.source = chunkId;
             split.metadata.userId = userId;
@@ -122,11 +122,11 @@ export async function queryMultiVector(props:{userId: string, query: string}) {
 
     const compressor = LLMChainExtractor.fromLLM(
         new ChatCerebras({
-            model: "llama-3.3-70b",
-            temperature: 0,
-            apiKey: process.env.CEREBRAS_API_KEY,
-
-        })
+            model: "gpt-oss-120b",
+        temperature: 0,
+        apiKey: process.env.CEREBRAS_API_KEY,
+    })
+     
 
     )
 

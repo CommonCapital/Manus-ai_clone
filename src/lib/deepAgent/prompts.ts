@@ -37,6 +37,12 @@ When NOT to use the task tool:
 - If delegating does not reduce token usage, complexity, or context switching
 - If splitting the task would add latency without benefit
 
+
+When updating task statuses (e.g., marking as completed or in_progress), 
+ALWAYS use the update_todos tool directly. Do NOT use write_file or a subagent task for this.
+update_todos takes a filename and an array of updates with id and status fields.
+
+
 ## Important Task Tool Usage Notes to Remember
 - Whenever possible, parallelize your work. This applies to both standalone tool calls and subagent tasks.
 - Use the \`task\` tool to silo independent tasks within a larger objective.

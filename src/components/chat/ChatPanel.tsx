@@ -7,8 +7,9 @@ import { MessageBubble } from "./chatbox/MessageBubble";
 import { ChatInput } from "./chatbox/ChatInput";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/store";
-import { addUserAndAiPlaceholder, appendToAssistantThinking, appendToLoastAiMessage, getChatHistory } from "@/store/chatSlice";
+import { addTodos, addUserAndAiPlaceholder, appendToAssistantThinking, appendToLastAiMessageSubAgent, appendToLoastAiMessage, clearTodos, getChatHistory, updateTodos } from "@/store/chatSlice";
 import { fetchThreads } from "@/store/threadSlice";
+import { tryLoadManifestWithRetries } from "next/dist/server/load-components";
 export default function ChatPanel({userId, threadId}: {userId: string, threadId:string}) {
     const [input, setInput] = useState("");
     const [loading, setLoading] = useState(false);
@@ -37,7 +38,9 @@ export default function ChatPanel({userId, threadId}: {userId: string, threadId:
 const queueRef = useRef<string[]>([]);
 const typingRef = useRef(false);
 const thinkingQueueRef = useRef<string[]>([]);
-const thinkingTypingRef = useRef(false)
+const thinkingTypingRef = useRef(false);
+const subAgentQueueRef = useRef<Record<string, any>[]>([ ]);
+const subAgentTypingRef = useRef(false);
 const typeNextThinking = () => {
     if (thinkingQueueRef.current.length === 0 ) {
         thinkingTypingRef.current = false;
@@ -60,7 +63,18 @@ const typeNext = () => {
     dispatch(appendToLoastAiMessage(chunk));
     setTimeout(typeNext, 6)
 };
+const typeSubAgentNextContent = () => {
+if (subAgentQueueRef.current.length === 0) {
+    subAgentTypingRef.current = false;
+    return;
 
+}
+subAgentTypingRef.current = true;
+const chunk = subAgentQueueRef.current
+.splice(0,1);
+const obj = chunk.pop() as any;
+dispatch(appendToLastAiMessageSubAgent(obj))
+};
 const sendMessage = async () => {
     const userMessage = input.trim();
 
@@ -73,7 +87,8 @@ const sendMessage = async () => {
             userId,
             thinking: "",
             threadId,
-            content: userMessage
+            content: userMessage,
+            sub_agent: []   
         })
     );
 
@@ -117,7 +132,39 @@ if (data.message !== undefined && data.message !==null) {
     }
 }
 
+if (data.sub_agent !== undefined && data.sub_agent !== null) {
+    const jsonPayload = data?.sub_agent
+    subAgentQueueRef.current.push(jsonPayload)
+    if (!subAgentTypingRef.current) {
+        typeSubAgentNextContent();
+    }
+}
 
+
+
+
+
+if (data.todo_list !== undefined && data.todo_list !== null) {
+    try {
+const jsonPayload = JSON.parse(data?.todo_list?.todoList) as any
+
+
+dispatch(clearTodos())
+dispatch(addTodos(jsonPayload))
+    } catch(error) {
+console.log('Failed to parse todos')
+    }
+}
+
+if (data.update_todo !== undefined && data.update_todo !== null) {
+    try {
+        const jsonPayload = data?.update_todo
+        console.log("Update todos :: ", jsonPayload)
+        dispatch(updateTodos(jsonPayload))
+    } catch (error) {
+        console.log('Failed to parse todos')
+    }
+}
 if (data.thinking !== undefined && data.thinking !==null) {
     for (const char of data.thinking) {
         thinkingQueueRef.current.push(char);
@@ -129,7 +176,6 @@ if (!thinkingTypingRef.current) {
 }
 
 }
-
                 }
 
 

@@ -35,7 +35,7 @@ const docToString = formatDocumentAsString(vectorData?.retrieveDocs)
 relevantLongTermMemory+= `\n\n#<data_retrieved_from_vector_db> \n${docToString}\n\n</data_retrieved_from_vector_db>`
 if (archiveLog.exist) {
     const bm25Data = await bm25Retriever(archiveLog?.data as string, userQuery)
-    relevantLongTermMemory += `\n\n#<data_retrieved_from_daily_log_arhive> ${bm25Data}<data_retrieved_from_daily_log_arhive>`
+    relevantLongTermMemory += `\n\n#<data_retrieved_from_daily_log_arhive> ${bm25Data}</data_retrieved_from_daily_log_arhive>`
 }
 console.log('relevantLongTermMemory. :::', relevantLongTermMemory)
         const fixedLayers = [
@@ -49,22 +49,36 @@ console.log('relevantLongTermMemory. :::', relevantLongTermMemory)
         const finalPrompt = `${fixedText}\n\n# New Input\n${userQuery}`;
         const numberOfTokens = estimateTokens(finalPrompt)
 
-        if (numberOfTokens > this.modelContextLimit) {
-            console.log(`==================compressing...=============`)
-       const compressData= await compressSTMTool.invoke({message: finalPrompt}) as string;
+    if (numberOfTokens > this.modelContextLimit) {
+try {
+console.log(`==================compressing...=============`)
+const compressData= await compressSTMTool.invoke({message: finalPrompt}) as string;
+console.log('STEP 1 done: compressData =', compressData?.slice(0, 100))
+
 await this.memory.emptyFileContent()
+console.log('STEP 2 done: emptyFileContent')
+
 const now = new Date()
 await this.memory.logToArchive("Assistant", compressData, now)
+console.log('STEP 3 done: logToArchive')
+
 const docToEmbed = new Document({
-    pageContent: compressData, metadata: {title: "user daily log summary"}
+pageContent: compressData, metadata: {title: "user daily log summary"}
 })
-
-await docEmbeddingMultiVector({
-userId: this.userData.userId,
-allDocs: [docToEmbed]
+console.log('STEP 4 done: Document created')
+// fire and forget — don't block the response on Pinecone
+docEmbeddingMultiVector({
+    userId: this.userData.userId,
+    allDocs: [docToEmbed]
+}).then(() => {
+    console.log('==========finish compression ==========')
+}).catch((err) => {
+    console.error('Pinecone embedding failed (non-blocking):', err.message)
 })
-
-console.log('==========finish compression ==========')
+} catch (compressionError) {
+console.error('COMPRESSION BLOCK FAILED:', compressionError)
+throw compressionError
+}
         }
 
 

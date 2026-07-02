@@ -42,7 +42,7 @@ ${basePrompt}
 ${TASK_SYSTEM_PROMPT}
     </system>
     `,
-tools: [...fileSystemTools, ...todoListTools, think_tool, createTaskTool(model,subagentConfigs )] as any,
+tools: [...fileSystemTools, ...todoListTools, think_tool, createTaskTool(model, subagentConfigs)] as any,
 middleware: [toolMonitoringMiddleware,]
 //ToolOutputSummarizerMiddleware
 });

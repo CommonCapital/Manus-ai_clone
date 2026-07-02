@@ -5,11 +5,11 @@ import {tool} from "@langchain/core/tools";
 import {z} from "zod";
 import { SystemMessage, HumanMessage } from "@langchain/core/messages";
 import {ChatCerebras} from "@langchain/cerebras";
-import "dotenv/config";
+
 
 
 const summarizationModel = new ChatCerebras({
-    model: "llama-3.3-70b",
+   model: "gpt-oss-120b",
     temperature: 0.3,
     apiKey: process.env.CEREBRAS_API_KEY,
 });

@@ -88,43 +88,34 @@ if (entry.isDirectory()) {
     }
 );
 
-
 export const read_file = tool(
-    async ({filename, offset = 0, limit =100}:any) => {
-try {
-    const resolvedPath = path.resolve(BASE_DIR, filename);
-
-    if (!resolvedPath.startsWith(BASE_DIR)) {
-        throw new Error("Access outside allowed directory is not permitted");
-    }
-
-    const content = await fs.promises.readFile(resolvedPath, "utf8");
-    const lines = content.split("\n");
-
-    const slice = lines.slice(offset, offset + limit);
-    const formatted = slice.map((line, i ) => 
-    `${(offset + i +1).toString().padStart(4)} | ${line}`
-    )
-    .join("\n");
-
-    if (offset + limit < lines.length) {
-        const remaining = lines.length - (offset + limit);
-        return `${formatted}\n\n[... ${remaining} more lines. Use offset=${offset + limit}]`
-    }
-
-    return formatted
-} catch (error) {
-    return `Error reading file: ${error}`
-}
+    async ({filename, path: pathAlias, offset, limit}: any) => {
+        const actualFilename = filename || pathAlias;
+        if (!actualFilename) {
+            return "Error: filename is required";
+        }
+        try {
+            const filePath = path.join(BASE_DIR, actualFilename);
+            const content = await fs.promises.readFile(filePath, "utf8");
+            const lines = content.split("\n");
+            const start = offset ?? 0;
+            const end = limit ? start + limit : lines.length;
+            return lines.slice(start, end)
+                .map((line, i) => `${String(start + i + 1).padStart(4)} | ${line}`)
+                .join("\n");
+        } catch (error: any) {
+            return `Error reading file: ${error.message}`;
+        }
     },
     {
-name: "read_file",
-description: "Read a file with line numbers. Use offset and limit for large files",
-schema: z.object({
-    filename: z.string().describe("filename to read"),
-    offset: z.number().optional().default(0),
-    limit: z.number().optional().default(1000),
-}),
+        name: "read_file",
+        description: "Read a file from the deep-agent workspace.",
+        schema: z.object({
+            filename: z.string().optional().describe("The filename to read"),
+            path: z.string().optional().describe("Alternative to filename"),
+            offset: z.coerce.number().optional().default(0),
+            limit: z.coerce.number().optional().default(200),
+        })
     }
 );
 

@@ -56,6 +56,7 @@ Examples of statements that MUST be saved:
 * "I am working as a software developer for the risk management platform in the construction field."
 
 
+
 This is REQUIRED WITHOUT the user saying "remember this"..
 
 `.trim();
