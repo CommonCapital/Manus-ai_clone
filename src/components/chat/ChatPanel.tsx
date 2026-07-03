@@ -7,7 +7,7 @@ import { MessageBubble } from "./chatbox/MessageBubble";
 import { ChatInput } from "./chatbox/ChatInput";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/store";
-import { addTodos, addUserAndAiPlaceholder, appendToAssistantThinking, appendToLastAiMessageSubAgent, appendToLoastAiMessage, clearTodos, getChatHistory, updateTodos } from "@/store/chatSlice";
+import { addAgentFile, addTodos, addUserAndAiPlaceholder, appendToAssistantThinking, appendToLastAiMessageSubAgent, appendToLoastAiMessage, clearTodos, getChatHistory, updateTodos } from "@/store/chatSlice";
 import { fetchThreads } from "@/store/threadSlice";
 import { tryLoadManifestWithRetries } from "next/dist/server/load-components";
 export default function ChatPanel({userId, threadId}: {userId: string, threadId:string}) {
@@ -49,7 +49,7 @@ const typeNextThinking = () => {
     thinkingTypingRef.current = true;
     const chunk = thinkingQueueRef.current.splice(0, 3).join("");
     dispatch(appendToAssistantThinking(chunk));
-    setTimeout(typeNextThinking, 12);
+    setTimeout(typeNextThinking, 16);
 };
 const typeNext = () => {
     if (queueRef.current.length === 0) {
@@ -141,7 +141,14 @@ if (data.sub_agent !== undefined && data.sub_agent !== null) {
 }
 
 
-
+if (data.write_file !== undefined && data.write_file !== null) {
+    const jsonPayload = data?.write_file
+    dispatch(addAgentFile(jsonPayload))
+}
+if (data.read_file !== undefined && data.read_file !== null) {
+    const jsonPayload = data?.read_file
+    dispatch(addAgentFile(jsonPayload))
+}
 
 
 if (data.todo_list !== undefined && data.todo_list !== null) {

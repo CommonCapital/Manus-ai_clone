@@ -43,6 +43,28 @@ export const POST = withErrorHandler(async (req: Request) => {
             try {
                for await (const [array,chunk] of graphStream) {
 
+                if ((chunk as any).write_file) {
+                    const write_file = {
+                       
+                        filename: chunk?.filename,
+                        content: chunk?.content
+                    };
+                    controller.enqueue(sse("write_file", {
+                        write_file
+                    }))
+                }
+
+                if((chunk as any).read_file) {
+                    const read_file = {
+                     
+                        filename: chunk?.filename,
+                        content: chunk?.content
+                    };
+                    controller.enqueue(sse("read_file", {
+                        read_file
+                    }))
+                }
+
 if ((chunk as any).update_todos) {
     const update_todo = {
         todos: chunk?.todos,

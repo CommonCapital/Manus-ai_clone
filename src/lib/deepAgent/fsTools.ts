@@ -11,14 +11,18 @@ const BASE_DIR = path.join(ROOT, "public", "deep-agent");
 
 export const write_file = tool(
     async ({filename, content
-    }:any) => {
+    }, toolConfig:any) => {
 try {
     const fullPath = path.join(BASE_DIR, filename);
 
     await fs.promises.mkdir(path.dirname(fullPath), {recursive:true});
 
     await fs.promises.writeFile(fullPath, content, "utf8");
-
+toolConfig.writer({
+    write_file: "write_file",
+    filename,
+    content
+})
     return JSON.stringify({
         message: `Successfully wrote ${content.length} characters to ${filename}`
     })

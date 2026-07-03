@@ -1,14 +1,18 @@
 import { ChatHistoryReturnType, ChatMessage, fetchChatHistory } from "@/lib/api/threads";
 import type { IFetchChatHistoryType } from "@/lib/api/threads";
+import {v4 as uuidv4} from "uuid";
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 export type TodoStatus = "in_progress" | "pending" | "completed"
 export type TodoListType = Array<{id:string, task:string, status:TodoStatus}>
+export type AgentFileType={filename:string, content:string}
 type ChatState = {
 messages: ChatMessage[];
 loading: boolean;
 streamingLoading: boolean;
 error: string | null;
-todos:TodoListType
+todos:TodoListType,
+agent_files: AgentFileType[],
+agent_images: any[],
 };
 
 const initialState: ChatState = {
@@ -17,6 +21,9 @@ todos: [],
 loading: false,
 streamingLoading: false,
 error: null,
+agent_files: [],
+agent_images: [],
+
 }
 
 
@@ -66,6 +73,19 @@ addUserAndAiPlaceholder(
 
 
     )
+},
+addAgentFile(
+    state, action: PayloadAction<AgentFileType>
+) {
+    state.agent_files.push(action.payload)
+},
+addAgentImage: (state,action) => {
+state.agent_images.push({
+    id: uuidv4(),
+    type: "image",
+    src: action.payload.src,
+    created_at: Date.now()
+})
 },
 appendToLastAiMessageSubAgent(state, action: PayloadAction<{sub_agent_name:string; content:string}>) {
 const last = state.messages[state.messages.length - 1];
@@ -142,5 +162,5 @@ state.messages = action.payload.messages.map((m:any) => ({...m, sub_agent: []}))
     },
 });
 
-export const {clearTodos, updateTodos, addTodos, appendToAssistantThinking, appendToLoastAiMessage, addUserAndAiPlaceholder, appendToLastAiMessageSubAgent }  = chatSlice.actions;
+export const {clearTodos, updateTodos, addAgentFile,addAgentImage,  addTodos, appendToAssistantThinking, appendToLoastAiMessage, addUserAndAiPlaceholder, appendToLastAiMessageSubAgent }  = chatSlice.actions;
 export default chatSlice.reducer;

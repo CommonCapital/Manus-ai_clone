@@ -3,6 +3,7 @@ import {AppDispatch, RootState} from "@/store";
 import { useMemo, useState } from "react";
 import { Check, ChevronDown, Circle, Loader2, MonitorPlay } from "lucide-react";
 import { TodoListType, TodoStatus } from "@/store/chatSlice";
+import { truncateTitle } from "@/lib/utils";
 
 
 export function TaskCard({todos}:{todos: TodoListType}) {
@@ -62,7 +63,7 @@ className="flex-1 flex items-center justify-between bg-white border "
 <div className="flex items-center gap-3 overflow-hidden">
 <StatusIcon status={activeTask?.status} />
 <span className="text-gray-800 text-sm truncate font-medium">
-{activeTask?.task}
+{truncateTitle(activeTask?.task,20)}
 </span>
 </div>
 
@@ -141,7 +142,7 @@ Task Progress
         : "text-gray-400"
     }`}
     >
-{task?.task}
+{truncateTitle(task?.task,60)}
     </span>
 </li>
         );

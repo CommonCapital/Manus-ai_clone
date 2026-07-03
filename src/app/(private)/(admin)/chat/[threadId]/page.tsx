@@ -4,7 +4,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { redirect } from "next/navigation";
 import AIWorkspace from "@/components/chat/chatbox/agent-ui/AIWorkspace";
-
+import AgentComputerWrapper from "@/components/chat/chatbox/agent-ui/AgentComputerWrapper"; 
 export default async function Page({params}: {params: Promise<{threadId: string}>}) {
   const {threadId} = await params;
   const session = await getServerSession(authOptions);
@@ -19,6 +19,7 @@ export default async function Page({params}: {params: Promise<{threadId: string}
       <main className="flex flex-1 overflow-hidden">
         <ChatPanel threadId={threadId} userId={session.user.id} />
       </main>
+      <AgentComputerWrapper />
     </div>
   );
 }
