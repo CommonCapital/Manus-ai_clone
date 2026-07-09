@@ -1,0 +1,46 @@
+[
+  {
+    "id": "63c38cc2-dc35-45c1-a96c-5e2b554159e3",
+    "task": "Update Flask app.py to dynamically generate full proxy URLs",
+    "assigned_to": "me",
+    "status": "completed",
+    "dependencies": [],
+    "created_at": "2026-03-11T20:27:44.132Z",
+    "updated_at": "2026-03-11T20:30:55.913Z",
+    "archived": true,
+    "note": "Historical task - moved from root folder"
+  },
+  {
+    "id": "fabdc5d4-a3cc-4a00-8d21-3c37b0ccf894",
+    "task": "Update index.html template to use dynamic URL variables",
+    "assigned_to": "me",
+    "status": "completed",
+    "dependencies": [],
+    "created_at": "2026-03-11T20:27:44.132Z",
+    "updated_at": "2026-03-11T20:30:55.913Z",
+    "archived": true,
+    "note": "Historical task - moved from root folder"
+  },
+  {
+    "id": "ee728647-134b-479d-b0bf-27b58f312386",
+    "task": "Restart Flask app and verify CSS loads with full URL",
+    "assigned_to": "me",
+    "status": "completed",
+    "dependencies": [],
+    "created_at": "2026-03-11T20:27:44.132Z",
+    "updated_at": "2026-03-11T20:30:55.913Z",
+    "archived": true,
+    "note": "Historical task - moved from root folder"
+  },
+  {
+    "id": "bc618c71-38f3-4867-8f9f-365c1a5c55e8",
+    "task": "Export files to sandbox-files folder",
+    "assigned_to": "me",
+    "status": "completed",
+    "dependencies": [],
+    "created_at": "2026-03-11T20:27:44.132Z",
+    "updated_at": "2026-03-11T20:31:25.734Z",
+    "archived": true,
+    "note": "Historical task - moved from root folder"
+  }
+]

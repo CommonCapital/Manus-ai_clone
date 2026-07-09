@@ -1,0 +1,46 @@
+[
+  {
+    "id": "943ddcdf-e3ef-4fa8-bc72-22bd69ee97f5",
+    "task": "Update project.md documentation with dynamic proxy URL solution details",
+    "assigned_to": "me",
+    "status": "completed",
+    "dependencies": [],
+    "created_at": "2026-03-11T20:49:37.707Z",
+    "updated_at": "2026-03-11T21:08:44.715Z",
+    "archived": true,
+    "note": "Historical task - moved from root folder"
+  },
+  {
+    "id": "db67ea25-7a4d-4eb7-b09e-f93a6685044f",
+    "task": "Create comprehensive documentation file (DOCUMENTATION.md) with implementation details",
+    "assigned_to": "me",
+    "status": "completed",
+    "dependencies": [],
+    "created_at": "2026-03-11T20:49:37.707Z",
+    "updated_at": "2026-03-11T21:08:44.715Z",
+    "archived": true,
+    "note": "Historical task - moved from root folder"
+  },
+  {
+    "id": "63ddbe8b-5f73-4ccd-aa18-733433d95338",
+    "task": "Create reusable Flask template folder structure for future projects",
+    "assigned_to": "me",
+    "status": "completed",
+    "dependencies": [],
+    "created_at": "2026-03-11T20:49:37.707Z",
+    "updated_at": "2026-03-11T21:08:44.715Z",
+    "archived": true,
+    "note": "Historical task - moved from root folder"
+  },
+  {
+    "id": "09860720-eb79-41b8-bfd8-947ca5725628",
+    "task": "Export template files to sandbox-files folder",
+    "assigned_to": "me",
+    "status": "completed",
+    "dependencies": [],
+    "created_at": "2026-03-11T20:49:37.707Z",
+    "updated_at": "2026-03-11T21:09:40.000Z",
+    "archived": true,
+    "note": "Historical task - moved from root folder"
+  }
+]

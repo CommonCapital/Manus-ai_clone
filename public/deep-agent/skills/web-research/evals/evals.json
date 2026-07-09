@@ -1,0 +1,77 @@
+{
+  "skill_name": "web-research",
+  "version": "2.0.0",
+  "evals": [
+    {
+      "id": 1,
+      "name": "quick-fact-lookup",
+      "prompt": "What is the current population of Tokyo in 2025?",
+      "expected_output": "A concise answer with population figure, source citation, and date of data. Should use Surface depth level.",
+      "expected_features": [
+        "Single statistic with source",
+        "Date of data included",
+        "Source quality indicator",
+        "Quick response format"
+      ],
+      "files": []
+    },
+    {
+      "id": 2,
+      "name": "comparative-research",
+      "prompt": "Compare the AI adoption rates between healthcare and finance industries in 2024-2025. Include statistics and trends.",
+      "expected_output": "Structured comparison report with statistics for both industries, multiple sources, confidence indicators, and a comparison table.",
+      "expected_features": [
+        "Query decomposition visible",
+        "Multiple sources per industry",
+        "Comparison table",
+        "Confidence levels for statistics",
+        "Source quality assessment",
+        "Standard depth research"
+      ],
+      "files": []
+    },
+    {
+      "id": 3,
+      "name": "contradiction-handling",
+      "prompt": "What percentage of companies have deployed AI agents in production? I've seen different numbers and want to understand the real picture.",
+      "expected_output": "Report that acknowledges conflicting statistics, explains differences (definitions, methodology), and presents transparent view with quality assessment.",
+      "expected_features": [
+        "Multiple sources with different figures",
+        "Contradiction documented",
+        "Explanation of discrepancies",
+        "Source quality comparison",
+        "Transparent presentation of range"
+      ],
+      "files": []
+    },
+    {
+      "id": 4,
+      "name": "deep-research-request",
+      "prompt": "Conduct a deep research analysis on the impact of large language models on academic writing and research integrity. I need comprehensive coverage for a policy paper.",
+      "expected_output": "Comprehensive report with 10+ sources, multiple aspects covered (benefits, risks, detection tools, policy responses), high-quality academic sources, and detailed methodology notes.",
+      "expected_features": [
+        "Deep depth level used",
+        "10+ sources consulted",
+        "Multiple perspectives (educators, students, publishers, tool developers)",
+        "Academic/peer-reviewed sources prioritized",
+        "Bias detection noted",
+        "Detailed methodology section",
+        "Research gaps identified"
+      ],
+      "files": []
+    },
+    {
+      "id": 5,
+      "name": "no-results-handling",
+      "prompt": "What were the total sales of the Apple Vision Pro in Q1 2025?",
+      "expected_output": "Report that transparently notes if specific data is unavailable, provides related available information, and suggests alternative search approaches.",
+      "expected_features": [
+        "Transparent about data availability",
+        "Related information provided",
+        "Search attempts documented",
+        "Alternative sources suggested if applicable"
+      ],
+      "files": []
+    }
+  ]
+}

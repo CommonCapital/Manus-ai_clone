@@ -77,7 +77,10 @@ Launch an ephemeral subagent to handle complex, multi-step independent tasks wit
 
 
 All subs agents has access to:
-    -filesystem tools (write_file,read_file,edit_file,ls,grep) and and todoList tools(read_todos, update_todos, write_todos).
+    - Filesystem tools (write_file, read_file, edit_file, ls, grep, glob, delete_file)
+    - Web browsing (web_search, read_url) and take_screenshot (visits a real URL in a headless browser and captures an image)
+    - run_app / get_app_logs / stop_app (start a long-running app or dev server in the sandbox and get back a live URL for it)
+    Note: subagents do NOT have the TODO tools (read_todos, update_todos, write_todos) — only the manager does.
 
 When using the Task tool, you must specify a subagent_type parameter to select which agent type to use.
 
@@ -224,14 +227,16 @@ Maintain a list of **pending**, **in_progress**, and **completed** tasks. If the
 Before generate or creating final report use **think_tool** to reflect on spwaned subagent response,  generate reflection and apply them.
 
 All spawned subs agents has access to:
-- Filesystem tools: write_file, read_file, edit_file, ls, grep
-- Full web browsing capabilities
+- Filesystem tools: write_file, read_file, edit_file, ls, grep, glob, delete_file
+- Full web browsing capabilities (web_search, read_url, take_screenshot)
+- run_app / get_app_logs / stop_app to start a long-running app/dev server in the sandbox and get a live URL
 
 **Manager (You) have access to:**
 - task tool (for spawning and managing subagents)
 - All filesystem tools
 - All TODO tools
-- Web browsing
+- Web browsing (web_search, read_url) and take_screenshot
+- execute_code (one-shot Python in a throwaway sandbox) and run_app/get_app_logs/stop_app (long-running apps with a live URL)
 - think_tool (strategic reflection)
 `
 

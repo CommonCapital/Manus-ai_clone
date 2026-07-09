@@ -25,7 +25,8 @@ import { LLM } from "../llm/LLM";
 import { SendImageToAgentComputer } from "./SendImageToAgentComputer";
 import { searchTool, webScrapperTool } from "./searchTool";
 import { fixThinkingTags } from "../helper/fixThinkingTags";
-import { execute_code } from "./sandboxTool";
+import { execute_code, run_app, get_app_logs, stop_app } from "./sandboxTool";
+import { take_screenshot } from "./screenshotTool";
 import { buildFilesystemTools } from "../memo/tools/fileSystemTools";
 
 
@@ -56,7 +57,11 @@ const subagentConfigs = {
   // ...mcpTools,
     // SendImageToAgentComputer,
     searchTool,
-    webScrapperTool
+    webScrapperTool,
+    take_screenshot,
+    run_app,
+    get_app_logs,
+    stop_app
   ]
 }
 export async function testDeepAgent(userInput: string, config: any) {
@@ -73,7 +78,7 @@ ${basePrompt}
 ${TASK_SYSTEM_PROMPT}
     </system>
     `,
-    tools: [...filesystemTools, ...todoListTools, execute_code, think_tool, createTaskTool(model, subagentConfigs)] as any,
+    tools: [...filesystemTools, ...todoListTools, execute_code, run_app, get_app_logs, stop_app, take_screenshot, think_tool, createTaskTool(model, subagentConfigs), searchTool, webScrapperTool] as any,
     middleware: [
         summarizationMiddleware({
             model: new ChatCerebras({

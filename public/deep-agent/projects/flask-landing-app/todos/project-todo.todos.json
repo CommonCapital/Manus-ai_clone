@@ -1,0 +1,56 @@
+[
+  {
+    "id": "ff660c23-74c0-4442-85eb-f7d423ae50d3",
+    "task": "Create project folder structure (src/, todos/, sandbox-files/)",
+    "assigned_to": "me",
+    "status": "completed",
+    "dependencies": [],
+    "created_at": "2026-03-11T19:36:03.478Z",
+    "updated_at": "2026-03-11T19:36:03.478Z"
+  },
+  {
+    "id": "9deddc2e-6bc2-415b-b24c-0014517bd4c5",
+    "task": "Create project.md metadata file",
+    "assigned_to": "me",
+    "status": "completed",
+    "dependencies": [],
+    "created_at": "2026-03-11T19:36:03.478Z",
+    "updated_at": "2026-03-11T19:36:03.478Z"
+  },
+  {
+    "id": "28c12c11-8ae9-418b-a646-d0a0c1544c6f",
+    "task": "Create Flask app files (app.py, templates, static)",
+    "assigned_to": "me",
+    "status": "completed",
+    "dependencies": [],
+    "created_at": "2026-03-11T19:36:03.478Z",
+    "updated_at": "2026-03-11T19:36:30.411Z"
+  },
+  {
+    "id": "8b7950ab-f60e-4183-8fcc-090fb8397afd",
+    "task": "Create requirements.txt",
+    "assigned_to": "me",
+    "status": "completed",
+    "dependencies": [],
+    "created_at": "2026-03-11T19:36:03.478Z",
+    "updated_at": "2026-03-11T19:36:30.411Z"
+  },
+  {
+    "id": "a9698214-4f84-4d4b-8e89-0b9902fa6d93",
+    "task": "Set up sandbox and deploy Flask app",
+    "assigned_to": "me",
+    "status": "completed",
+    "dependencies": [],
+    "created_at": "2026-03-11T19:36:03.478Z",
+    "updated_at": "2026-03-11T19:39:30.274Z"
+  },
+  {
+    "id": "83da4bba-bdee-4b17-bc3e-68ad67f05bec",
+    "task": "Export sandbox files to project folder",
+    "assigned_to": "me",
+    "status": "completed",
+    "dependencies": [],
+    "created_at": "2026-03-11T19:36:03.478Z",
+    "updated_at": "2026-03-11T19:40:02.175Z"
+  }
+]

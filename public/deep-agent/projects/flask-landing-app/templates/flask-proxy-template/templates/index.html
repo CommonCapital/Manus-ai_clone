@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome | Flask App</title>
+    
+    <!-- Dynamic full URL for the stylesheet - works in sandbox proxy -->
+    <link rel="stylesheet" href="{{ static_url }}/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <nav>
+                <div class="logo">MyApp</div>
+                <ul class="nav-links">
+                    <li><a href="#">Home</a></li>
+                    <li><a href="#">About</a></li>
+                    <li><a href="#">Contact</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <main>
+            <section class="hero">
+                <h1>Welcome to MyApp</h1>
+                <p>Your Flask application is running successfully with dynamic proxy URL support!</p>
+                <p class="info">This template automatically generates correct URLs for static assets in sandbox environments.</p>
+                <a href="#" class="cta-button">Get Started</a>
+            </section>
+
+            <section class="features">
+                <div class="feature-card">
+                    <h3>🚀 Dynamic URLs</h3>
+                    <p>Static assets load correctly in any sandbox proxy environment</p>
+                </div>
+                <div class="feature-card">
+                    <h3>⚡ Fast Setup</h3>
+                    <p>Copy, install, run - ready in minutes</p>
+                </div>
+                <div class="feature-card">
+                    <h3>🛠️ Easy to Customize</h3>
+                    <p>Clean structure, well-documented code</p>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <p>&copy; 2026 MyApp. Built with Flask. Template for Ijambo.</p>
+        </footer>
+    </div>
+
+    <!-- Example of loading JavaScript with dynamic URL -->
+    <!-- <script src="{{ static_url }}/main.js"></script> -->
+</body>
+</html>

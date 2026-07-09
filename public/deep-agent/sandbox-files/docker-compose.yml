@@ -1,0 +1,126 @@
+# ========================================
+# Docker Compose for Node.js + Chromium Automation
+# ========================================
+# Purpose: Automate web scraping/browsing scripts
+# Author: Created for Ben's sandbox environment
+# ========================================
+
+version: "3.9"
+
+services:
+  # Main automation service
+  nodejs-chromium:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: nodejs-chromium-sandbox:latest
+    container_name: nodejs-automation
+    
+    # Volume mounting for scripts and output
+    volumes:
+      - ./scripts:/app/scripts          # Your automation scripts
+      - ./output:/app/output            # Output files (screenshots, data, etc.)
+      - ./data:/app/data                # Data files (JSON, CSV, etc.)
+    
+    # Working directory inside container
+    working_dir: /app
+    
+    # Default command (can be overridden)
+    command: ["node"]
+    
+    # Environment variables
+    environment:
+      - NODE_ENV=development
+      - PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
+      - CHROMIUM_FLAGS=--no-sandbox --disable-gpu --disable-dev-shm-usage --disable-setuid-sandbox
+    
+    # Critical for Chromium - shared memory size
+    shm_size: "2gb"
+    
+    # Security options for Chromium
+    security_opt:
+      - seccomp:unconfined
+    
+    # Capabilities needed for Chromium
+    cap_add:
+      - SYS_ADMIN
+    
+    # Resource limits
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 4G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+    
+    # Network mode (host for some scenarios)
+    # network_mode: host  # Uncomment if needed
+    
+    # Keep container running for interactive use
+    stdin_open: true
+    tty: true
+    
+    # Restart policy
+    restart: "no"
+
+  # ========================================
+  # Alternative Profiles
+  # ========================================
+  
+  # Profile for running a specific script
+  # Usage: docker compose --profile scrape run nodejs-chromium
+  # Note: Use 'docker compose run' with command override instead
+
+# ========================================
+# Named Volumes (optional, for persistence)
+# ========================================
+volumes:
+  npm-cache:
+    driver: local
+
+# ========================================
+# Networks (optional, for isolation)
+# ========================================
+networks:
+  automation-network:
+    driver: bridge
+
+# ========================================
+# USAGE EXAMPLES
+# ========================================
+#
+# 1. Build and run interactively:
+#    docker compose build
+#    docker compose run --rm nodejs-chromium bash
+#
+# 2. Run a specific script:
+#    docker compose run --rm nodejs-chromium node /app/scripts/scrape.js
+#
+# 3. Run with npm:
+#    docker compose run --rm nodejs-chromium npm install axios
+#
+# 4. Run in background:
+#    docker compose up -d
+#    docker compose exec nodejs-chromium node /app/scripts/scrape.js
+#
+# 5. View logs:
+#    docker compose logs -f
+#
+# 6. Stop and cleanup:
+#    docker compose down
+#
+# 7. Rebuild after Dockerfile changes:
+#    docker compose build --no-cache
+#
+# ========================================
+# QUICK SCRIPT EXECUTION
+# ========================================
+#
+# Create a script in ./scripts/ folder, then:
+#    docker compose run --rm nodejs-chromium node /app/scripts/your-script.js
+#
+# Or use the helper script:
+#    ./run-script.sh scripts/your-script.js
+#

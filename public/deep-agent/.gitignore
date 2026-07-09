@@ -1,0 +1,136 @@
+# ============================================
+# Ijambo's Workspace .gitignore
+# ============================================
+
+# --------------------------------------------
+# Temporary Files
+# --------------------------------------------
+# Summarization middleware reports
+reports-*.md
+
+# Temporary todo lists (keep project-specific ones)
+/*.todos.json
+
+# --------------------------------------------
+# Python
+# --------------------------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+venv/
+ENV/
+env/
+.venv/
+
+# --------------------------------------------
+# Node.js
+# --------------------------------------------
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.npm
+.yarn-integrity
+
+# Build outputs
+dist/
+build/
+.next/
+out/
+
+# --------------------------------------------
+# TypeScript
+# --------------------------------------------
+*.tsbuildinfo
+
+# --------------------------------------------
+# IDE / Editor
+# --------------------------------------------
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# --------------------------------------------
+# Environment Files
+# --------------------------------------------
+.env
+.env.local
+.env.*.local
+*.env
+
+# --------------------------------------------
+# Logs
+# --------------------------------------------
+logs/
+*.log
+
+# --------------------------------------------
+# Testing
+# --------------------------------------------
+coverage/
+.coverage
+.pytest_cache/
+.tox/
+.nox/
+
+# --------------------------------------------
+# Docker
+# --------------------------------------------
+.docker/
+docker-compose.override.yml
+
+# --------------------------------------------
+# Sandbox / Temporary
+# --------------------------------------------
+test-files/
+test-files-backup/
+tmp/
+temp/
+
+# --------------------------------------------
+# OS Generated
+# --------------------------------------------
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# --------------------------------------------
+# Project Specific (keep these)
+# --------------------------------------------
+# Keep project-specific todo lists
+!projects/**/*.todos.json
+!skills/**/*.todos.json
+
+# Keep research files
+!research/**/*.md
+
+# Keep sandbox exports
+!sandbox-files/**/*

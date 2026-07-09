@@ -12,6 +12,9 @@
 
 # testing
 /coverage
+/public/memory/*
+/public/chat-history/*
+/public/threads/*
 
 # next.js
 /.next/

@@ -1,0 +1,48 @@
+[
+  {
+    "id": "60b9a4ca-1960-401e-b107-40e2fe1e35ad",
+    "task": "Update project-organization skill to include README.md requirement",
+    "assigned_to": "me",
+    "status": "completed",
+    "dependencies": [],
+    "created_at": "2026-03-11T22:07:00.000Z",
+    "updated_at": "2026-03-11T22:07:30.000Z"
+  },
+  {
+    "id": "bbe944de-5ca5-47ea-bc55-79bbff9a3217",
+    "task": "Organize existing TODO files from root into proper project folders",
+    "assigned_to": "me",
+    "status": "completed",
+    "dependencies": [],
+    "created_at": "2026-03-11T22:07:00.000Z",
+    "updated_at": "2026-03-11T22:08:00.000Z"
+  },
+  {
+    "id": "def42a16-d188-4357-96a8-39d55fc8752b",
+    "task": "Create README.md for existing flask-landing-app project",
+    "assigned_to": "me",
+    "status": "completed",
+    "dependencies": [],
+    "created_at": "2026-03-11T22:07:00.000Z",
+    "updated_at": "2026-03-11T22:08:00.000Z"
+  },
+  {
+    "id": "bf28b7b6-ba93-4ca9-a311-f461182606bc",
+    "task": "Clean up root folder by removing scattered TODO files",
+    "assigned_to": "me",
+    "status": "completed",
+    "dependencies": [],
+    "created_at": "2026-03-11T22:07:00.000Z",
+    "updated_at": "2026-03-11T22:08:30.000Z",
+    "note": "Marked files as MOVED - cannot delete files directly"
+  },
+  {
+    "id": "63ddbe8b-5f73-4ccd-aa18-733433d95338",
+    "task": "Update skills registry README to reflect changes",
+    "assigned_to": "me",
+    "status": "completed",
+    "dependencies": [],
+    "created_at": "2026-03-11T22:07:00.000Z",
+    "updated_at": "2026-03-11T22:09:00.000Z"
+  }
+]

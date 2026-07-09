@@ -1,0 +1,65 @@
+{
+  "workflow_id": "flask-app-todo-sync-workflow",
+  "tasks": [
+    {
+      "task": "Create README.md",
+      "assigned_to": "me",
+      "status": "completed",
+      "note": "Project overview and setup instructions"
+    },
+    {
+      "task": "Create project.md",
+      "assigned_to": "me",
+      "status": "completed",
+      "note": "Project metadata and description"
+    },
+    {
+      "task": "Create todos/ folder",
+      "assigned_to": "me",
+      "status": "completed",
+      "note": "Todo list folder created"
+    },
+    {
+      "task": "Create project-todo.todos.json",
+      "assigned_to": "me",
+      "status": "completed",
+      "note": "Initial todo list created"
+    },
+    {
+      "task": "Create src/ folder",
+      "assigned_to": "me",
+      "status": "completed",
+      "note": "Created via app.py file creation"
+    },
+    {
+      "task": "Create app.py",
+      "assigned_to": "me",
+      "status": "completed",
+      "note": "Main Flask application file"
+    },
+    {
+      "task": "Create templates/ folder",
+      "assigned_to": "me",
+      "status": "completed",
+      "note": "Created via index.html file creation"
+    },
+    {
+      "task": "Create index.html",
+      "assigned_to": "me",
+      "status": "completed",
+      "note": "Landing page HTML template"
+    },
+    {
+      "task": "Create sandbox-files/ folder",
+      "assigned_to": "me",
+      "status": "completed",
+      "note": "Sandbox files folder created"
+    },
+    {
+      "task": "Create requirements.txt",
+      "assigned_to": "me",
+      "status": "completed",
+      "note": "Flask dependency"
+    }
+  ]
+}

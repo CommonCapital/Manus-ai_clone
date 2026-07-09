@@ -1,0 +1,37 @@
+{
+  "projects": [
+    {
+      "name": "flask-landing-app",
+      "path": "projects/flask-landing-app",
+      "type": "Flask App",
+      "created": "2026-03-11",
+      "status": "completed",
+      "has_readme": true,
+      "description": "Flask landing page with dynamic proxy URL solution"
+    },
+    {
+      "name": "flask-app-todo-sync",
+      "path": "projects/flask-app-todo-sync",
+      "type": "Flask App",
+      "created": "2026-03-11",
+      "status": "in_progress",
+      "has_readme": true,
+      "description": "Simple Flask app with landing page - test case for Todo Sync Protocol"
+    },
+    {
+      "name": "react-button-component",
+      "path": "projects/react-button-component",
+      "type": "React Component",
+      "created": "2026-03-13",
+      "status": "active",
+      "has_readme": false,
+      "description": "React button component project"
+    }
+  ],
+  "metadata": {
+    "last_updated": "2026-03-13",
+    "total_projects": 3,
+    "active_projects": 2,
+    "completed_projects": 1
+  }
+}

@@ -1,0 +1,57 @@
+[
+  {
+    "id": "24c5c7f7-0651-4bea-aa71-f1491d1a7dd6",
+    "task": "Check current sandbox state and verify Flask app status",
+    "assigned_to": "me",
+    "status": "completed",
+    "dependencies": [],
+    "created_at": "2026-03-11T20:17:51.684Z",
+    "updated_at": "2026-03-11T20:17:51.684Z",
+    "archived": true,
+    "note": "Historical task - moved from root folder"
+  },
+  {
+    "id": "0e0a4660-4958-4a1a-a284-5538d4c720c4",
+    "task": "Fix Flask app to use relative paths for static assets (per skill.md)",
+    "assigned_to": "me",
+    "status": "completed",
+    "dependencies": [],
+    "created_at": "2026-03-11T20:17:51.684Z",
+    "updated_at": "2026-03-11T20:17:51.684Z",
+    "archived": true,
+    "note": "Historical task - moved from root folder"
+  },
+  {
+    "id": "7a836d0b-e9ed-4da4-8dff-bda8cb9fc3fa",
+    "task": "Restart Flask app and verify it's running",
+    "assigned_to": "me",
+    "status": "completed",
+    "dependencies": [],
+    "created_at": "2026-03-11T20:17:51.684Z",
+    "updated_at": "2026-03-11T20:17:51.684Z",
+    "archived": true,
+    "note": "Historical task - moved from root folder"
+  },
+  {
+    "id": "391aab5a-3160-4da3-ab4d-5581ddeca8ca",
+    "task": "Test the proxy URL and confirm CSS loads correctly",
+    "assigned_to": "me",
+    "status": "completed",
+    "dependencies": [],
+    "created_at": "2026-03-11T20:17:51.684Z",
+    "updated_at": "2026-03-11T20:17:51.684Z",
+    "archived": true,
+    "note": "Historical task - moved from root folder"
+  },
+  {
+    "id": "59eb24ad-85b4-4352-9e74-9202ef94dcae",
+    "task": "Export files to sandbox-files folder",
+    "assigned_to": "me",
+    "status": "completed",
+    "dependencies": [],
+    "created_at": "2026-03-11T20:17:51.684Z",
+    "updated_at": "2026-03-11T20:17:51.684Z",
+    "archived": true,
+    "note": "Historical task - moved from root folder"
+  }
+]
