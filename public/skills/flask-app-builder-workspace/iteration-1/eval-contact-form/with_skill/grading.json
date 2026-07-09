@@ -1,0 +1,34 @@
+{
+  "expectations": [
+    {
+      "text": "The contact form has name, email, and message fields",
+      "passed": true,
+      "evidence": "ContactForm in forms.py has: name (StringField), email (StringField), message (TextAreaField)"
+    },
+    {
+      "text": "Flask-WTF is used for form handling",
+      "passed": true,
+      "evidence": "Flask-WTF imported and used: from flask_wtf import FlaskForm, CSRFProtect(app) in __init__.py"
+    },
+    {
+      "text": "Form validation works (required fields, email format)",
+      "passed": true,
+      "evidence": "Validators applied: DataRequired(), Email() for email field, Length() for message"
+    },
+    {
+      "text": "A success message/page appears after submission",
+      "passed": true,
+      "evidence": "success.html template created, route redirects to success page after form.validate_on_submit()"
+    },
+    {
+      "text": "CSRF protection is enabled",
+      "passed": true,
+      "evidence": "CSRF token found in HTML: <input id=\"csrf_token\" name=\"csrf_token\" type=\"hidden\" value=\"...\">"
+    },
+    {
+      "text": "The app is running in a sandbox",
+      "passed": true,
+      "evidence": "Sandbox ID: 4190b3a2-d58a-4b5b-8ef7-bb6cbe749d36, running on port 8000"
+    }
+  ]
+}

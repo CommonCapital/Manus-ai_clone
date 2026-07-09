@@ -1,25 +1,46 @@
-import { TestDeepAgent } from "@/lib/deepAgent/deepAgent";
-import { edit_file, glob, grep, ls, read_file, write_file } from "@/lib/deepAgent/fsTools";
-import { read_todos, update_todos, write_todos } from "@/lib/deepAgent/todoTools";
+
+import { testDeepAgent } from "@/lib/deepAgent/deepAgent";
+import { write_file, read_file, edit_file, ls, grep, glob } from "@/lib/deepAgent/fsTools";
+import { get_next_runnable_tasks, read_todos, update_todos, write_todos } from "@/lib/deepAgent/todoTools";
+import { graph } from "@/lib/graph/graph";
 import { LLM } from "@/lib/llm/LLM";
 import { createMemoryAgent } from "@/lib/memo/MemoryAgent";
-import { MemoryManager } from "@/lib/memo/MemoryManager";
+import { generateThreadTitleTool } from "@/lib/tools/threadTools";
+
 import { NextResponse } from "next/server";
-import path from "node:path";
+import path from "path";
+import { MultiServerMCPClient } from "@langchain/mcp-adapters";
+import { retrieveRelevantLTMTool } from "@/lib/memo/tools/retrieveLTMTool";
 
 
-export async function GET(req:Request) {
-    try {
-const llm = LLM.getInstance("fireworks")
+export async function GET(req: Request) {
+  try {
+// Initialize the stealth plugin
 
-await TestDeepAgent("test message", { writer: (data: any) => console.log("test writer:", data) })
-     return NextResponse.json(
-        {message: "test created"}
-     );
-    } catch (error) {
-        console.error(`Error: ${error}`)
-          return NextResponse.json(
-      { error: error ?? "Unknown error" },
-      { status: 500 });
-    }
+
+    // const llm = LLM.getInstance("cerebras")
+
+    // const res=await ls.invoke({path:"skills"})
+
+    // const res=await read_file.invoke({"filename":"/skills","offset":0,"limit":200})
+
+    // const r=await retrieveRelevantLTMTool.invoke({query:"ben's preffered programming languages"})
+
+  
+
+    return NextResponse.json(
+      { message: "task created " },
+    );
+
+  } catch (err: any) {
+    return NextResponse.json(
+      { error: err?.message },
+      { status: err?.status || 500 }
+    );
+  }
 }
+
+
+
+
+

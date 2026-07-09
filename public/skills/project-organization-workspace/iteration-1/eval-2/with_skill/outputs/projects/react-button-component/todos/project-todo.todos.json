@@ -1,0 +1,30 @@
+{
+  "workflow_id": "react-button-component-workflow",
+  "tasks": [
+    {
+      "task": "Set up project structure",
+      "assigned_to": "me",
+      "status": "completed"
+    },
+    {
+      "task": "Create src/ folder",
+      "assigned_to": "me",
+      "status": "completed"
+    },
+    {
+      "task": "Create components folder",
+      "assigned_to": "me",
+      "status": "completed"
+    },
+    {
+      "task": "Create Button component",
+      "assigned_to": "me",
+      "status": "completed"
+    },
+    {
+      "task": "Create sandbox-files/ folder",
+      "assigned_to": "me",
+      "status": "completed"
+    }
+  ]
+}

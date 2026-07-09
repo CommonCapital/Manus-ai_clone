@@ -1,0 +1,27 @@
+{
+  "eval_id": 1,
+  "eval_name": "simple-web-app",
+  "prompt": "Create a simple Flask web app with a home page and an about page. The home page should say 'Welcome to my Flask App' and the about page should have a brief description. Run it in a sandbox and show me the URL.",
+  "assertions": [
+    {
+      "name": "home_route_exists",
+      "description": "The Flask app has a home route at '/'"
+    },
+    {
+      "name": "about_route_exists", 
+      "description": "The Flask app has an about route at '/about'"
+    },
+    {
+      "name": "uses_templates",
+      "description": "The app uses templates (not just return strings)"
+    },
+    {
+      "name": "sandbox_running",
+      "description": "The app is running in a sandbox"
+    },
+    {
+      "name": "url_provided",
+      "description": "A public URL is provided to access the app"
+    }
+  ]
+}

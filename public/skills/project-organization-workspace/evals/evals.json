@@ -1,0 +1,82 @@
+{
+  "skill_name": "project-organization",
+  "evals": [
+    {
+      "id": 1,
+      "name": "flask-app-todo-sync",
+      "prompt": "Build me a simple Flask app with a landing page. Create the project structure and track all tasks in a todo list.",
+      "expected_output": "Project folder created with proper structure, todo list that syncs with file creation",
+      "files": [],
+      "assertions": [
+        {
+          "name": "project_folder_created",
+          "check": "Project folder exists under projects/",
+          "expected": true
+        },
+        {
+          "name": "todo_list_exists",
+          "check": "Todo list file exists in todos/ folder",
+          "expected": true
+        },
+        {
+          "name": "todo_synced_with_files",
+          "check": "Todo list has tasks marked as completed after file creation",
+          "expected": true
+        },
+        {
+          "name": "readme_exists",
+          "check": "README.md exists in project root",
+          "expected": true
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "react-component-todo-sync",
+      "prompt": "Create a React project with a Button component. Set up the project structure and track progress with todos.",
+      "expected_output": "React project with components folder, Button component, and synced todo list",
+      "files": [],
+      "assertions": [
+        {
+          "name": "components_folder_created",
+          "check": "Components folder exists in src/",
+          "expected": true
+        },
+        {
+          "name": "button_component_created",
+          "check": "Button component file exists",
+          "expected": true
+        },
+        {
+          "name": "folder_task_completed",
+          "check": "Todo for creating components folder is marked completed",
+          "expected": true
+        },
+        {
+          "name": "component_task_completed",
+          "check": "Todo for creating Button component is marked completed",
+          "expected": true
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "file-deletion-todo-update",
+      "prompt": "I have a project at projects/test-app/ with an old file src/deprecated.py that needs to be removed. Delete it and update the todo list accordingly.",
+      "expected_output": "File deleted, todo list updated to reflect the deletion",
+      "files": [],
+      "assertions": [
+        {
+          "name": "file_deleted",
+          "check": "deprecated.py file no longer exists",
+          "expected": true
+        },
+        {
+          "name": "todo_updated_on_deletion",
+          "check": "Related todo task is marked as cancelled or updated",
+          "expected": true
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,56 @@
+[
+  {
+    "id": "6a41bd84-afe8-433f-a5b2-11a020aa27a9",
+    "task": "Analyze current project-organization skill structure and identify integration points for todo tracking",
+    "assigned_to": "me",
+    "status": "pending",
+    "dependencies": [],
+    "created_at": "2026-03-12T09:14:42.512Z",
+    "updated_at": "2026-03-12T09:14:42.512Z"
+  },
+  {
+    "id": "825b0ffd-346c-45a3-a657-abe4e150e90e",
+    "task": "Design the track-todo sub-action mechanism with clear triggers and behaviors",
+    "assigned_to": "me",
+    "status": "pending",
+    "dependencies": [],
+    "created_at": "2026-03-12T09:14:42.512Z",
+    "updated_at": "2026-03-12T09:14:42.512Z"
+  },
+  {
+    "id": "a9d220e3-0b97-442c-80b9-c6a605c70fc9",
+    "task": "Draft the updated SKILL.md with todo tracking integration",
+    "assigned_to": "me",
+    "status": "pending",
+    "dependencies": [],
+    "created_at": "2026-03-12T09:14:42.512Z",
+    "updated_at": "2026-03-12T09:14:42.512Z"
+  },
+  {
+    "id": "35ba96c7-5829-43e0-872b-9643222733ae",
+    "task": "Create test cases to validate the skill modification",
+    "assigned_to": "subagent",
+    "status": "pending",
+    "dependencies": [],
+    "created_at": "2026-03-12T09:14:42.512Z",
+    "updated_at": "2026-03-12T09:14:42.512Z"
+  },
+  {
+    "id": "311b7935-47bb-4d5b-9ad0-64d231163f13",
+    "task": "Run evaluations and gather feedback",
+    "assigned_to": "subagent",
+    "status": "pending",
+    "dependencies": [],
+    "created_at": "2026-03-12T09:14:42.512Z",
+    "updated_at": "2026-03-12T09:14:42.512Z"
+  },
+  {
+    "id": "9c750df9-a8af-406f-ba99-1700dcf30ed7",
+    "task": "Finalize and integrate the skill modification",
+    "assigned_to": "me",
+    "status": "pending",
+    "dependencies": [],
+    "created_at": "2026-03-12T09:14:42.512Z",
+    "updated_at": "2026-03-12T09:14:42.512Z"
+  }
+]

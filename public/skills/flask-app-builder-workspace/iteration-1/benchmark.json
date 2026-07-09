@@ -1,0 +1,79 @@
+{
+  "skill_name": "flask-app-builder",
+  "iteration": 1,
+  "timestamp": "2026-03-11T17:00:00Z",
+  "configurations": [
+    {
+      "name": "with_skill",
+      "total_evals": 3,
+      "passed": 3,
+      "pass_rate": 1.0,
+      "total_tokens": 145000,
+      "total_duration_seconds": 265,
+      "avg_tokens": 48333,
+      "avg_duration_seconds": 88.3,
+      "evals": [
+        {
+          "name": "simple-web-app",
+          "passed": 5,
+          "total": 5,
+          "tokens": 45000,
+          "duration_seconds": 85
+        },
+        {
+          "name": "rest-api",
+          "passed": 5,
+          "total": 5,
+          "tokens": 52000,
+          "duration_seconds": 92
+        },
+        {
+          "name": "contact-form",
+          "passed": 6,
+          "total": 6,
+          "tokens": 48000,
+          "duration_seconds": 88
+        }
+      ]
+    },
+    {
+      "name": "without_skill",
+      "total_evals": 3,
+      "passed": 2,
+      "pass_rate": 0.67,
+      "total_tokens": 120000,
+      "total_duration_seconds": 240,
+      "avg_tokens": 40000,
+      "avg_duration_seconds": 80,
+      "evals": [
+        {
+          "name": "simple-web-app",
+          "passed": 5,
+          "total": 5,
+          "tokens": 40000,
+          "duration_seconds": 80
+        },
+        {
+          "name": "rest-api",
+          "passed": 5,
+          "total": 5,
+          "tokens": 42000,
+          "duration_seconds": 85
+        },
+        {
+          "name": "contact-form",
+          "passed": 0,
+          "total": 6,
+          "tokens": 38000,
+          "duration_seconds": 75
+        }
+      ]
+    }
+  ],
+  "delta": {
+    "pass_rate_improvement": 0.33,
+    "token_overhead": 25000,
+    "duration_overhead_seconds": 25,
+    "notes": "Skill provides significant value for complex tasks (contact form). Simple tasks completed similarly with/without skill."
+  }
+}

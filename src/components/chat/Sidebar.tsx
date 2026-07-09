@@ -13,12 +13,16 @@ import { useDispatch, useSelector } from 'react-redux';
 import AccountButton from '../accounts/AccountButton';
 
 export default function Sidebar ()  {
+   
+    const dispatch = useDispatch<AppDispatch>();
+    const {leftPanel} = useSelector(
+        (state:RootState) => state.chat
+    )
 
-    const [menuOpen, setMenuOpen] = useState(true);
+    const [menuOpen, setMenuOpen] = useState(leftPanel==='sidebar'?true:false);
     
      const {data: session} = useSession()
-     
-    const dispatch = useDispatch<AppDispatch>();
+  
     const {threads} = useSelector((state: RootState) => state.thread);
     const router = useRouter();
 const userId = session?.user?.id;
@@ -46,9 +50,18 @@ useEffect(() => {
     }
 }, [dispatch, userId])
 
+useEffect(() => {
+    if(leftPanel==='sidebar') {
+        setMenuOpen(true)
+    } else{
+        setMenuOpen(false)
+    }
+}, [leftPanel])
 
   return (
-    <div className='relative flex h-full'>
+    <div 
+    style={{display:leftPanel==="sidebar"?"":"none"}}
+    className='relative flex h-full'>
 <aside
 className={cn(
 "flex flex-col border-r bg-slate-50 transition-all",

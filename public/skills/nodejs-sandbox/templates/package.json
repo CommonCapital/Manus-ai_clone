@@ -1,0 +1,16 @@
+{
+  "name": "nodejs-app",
+  "version": "1.0.0",
+  "description": "A Node.js application running on Node.js 22",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js"
+  },
+  "keywords": ["nodejs", "javascript"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {}
+}

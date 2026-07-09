@@ -1,0 +1,27 @@
+{
+  "eval_id": 2,
+  "eval_name": "rest-api",
+  "prompt": "Build a Flask REST API with endpoints for managing a list of tasks. I need GET /api/tasks to list all tasks, POST /api/tasks to create a new task, and DELETE /api/tasks/<id> to delete a task. Store tasks in memory (no database needed). Run it in a sandbox.",
+  "assertions": [
+    {
+      "name": "get_tasks_endpoint",
+      "description": "GET /api/tasks returns a JSON list of tasks"
+    },
+    {
+      "name": "post_tasks_endpoint",
+      "description": "POST /api/tasks creates a new task and returns 201"
+    },
+    {
+      "name": "delete_tasks_endpoint",
+      "description": "DELETE /api/tasks/<id> removes a task and returns 204"
+    },
+    {
+      "name": "json_handling",
+      "description": "The API handles JSON request bodies correctly"
+    },
+    {
+      "name": "sandbox_running",
+      "description": "The app is running in a sandbox with a public URL"
+    }
+  ]
+}

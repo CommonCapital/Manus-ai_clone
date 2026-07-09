@@ -15,7 +15,9 @@ export default async function Page({params}: {params: Promise<{threadId: string}
 
   return (
     <div className="flex h-screen w-full overflow-hidden bg-slate-50 text-slate-950">
+      <Sidebar />
       <AIWorkspace/>
+
       <main className="flex flex-1 overflow-hidden">
         <ChatPanel threadId={threadId} userId={session.user.id} />
       </main>

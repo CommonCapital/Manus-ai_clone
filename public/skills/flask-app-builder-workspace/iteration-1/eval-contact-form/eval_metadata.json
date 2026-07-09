@@ -1,0 +1,31 @@
+{
+  "eval_id": 3,
+  "eval_name": "contact-form",
+  "prompt": "Create a Flask app with a contact form that has name, email, and message fields. When submitted, it should show a success message. Use Flask-WTF for form validation. Deploy it in a sandbox environment.",
+  "assertions": [
+    {
+      "name": "form_fields",
+      "description": "The contact form has name, email, and message fields"
+    },
+    {
+      "name": "flask_wtf_used",
+      "description": "Flask-WTF is used for form handling"
+    },
+    {
+      "name": "validation_works",
+      "description": "Form validation works (required fields, email format)"
+    },
+    {
+      "name": "success_message",
+      "description": "A success message/page appears after submission"
+    },
+    {
+      "name": "csrf_protection",
+      "description": "CSRF protection is enabled"
+    },
+    {
+      "name": "sandbox_running",
+      "description": "The app is running in a sandbox"
+    }
+  ]
+}

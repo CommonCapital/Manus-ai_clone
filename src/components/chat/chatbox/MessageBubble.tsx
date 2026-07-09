@@ -18,74 +18,69 @@ export const MessageBubble = memo(function MessageNunnle({
     const isUser = message?.role === "user";
     const [showThinking, setShowThinking] = useState(false);
 
-    return (
-       <div
-       className={cn(
-"flex group",
-isUser ? "justify-end" : "justify-start"
-       )}
-       >
-<div
-className={cn(
-    "max-w-[75%] rounded-2xl px-4 py-3 text-sm relative",
-    isUser 
-    ? "bg-slate-200 text-gray-900 rounded-br-sm"
-    : "text-slate-800 rounded-bl-sm"
-)}
->
-    {!isUser && (
-        <p className='mb-1 text-[11px] font-semibold text-slate-500'>
-            AI
+ return (
+  <div
+    className={cn(
+      "flex",
+      isUser ? "justify-end" : "justify-start"
+    )}
+  >
+    <div
+      className={cn(
+        "relative w-fit max-w-[90%] sm:max-w-[85%] md:max-w-[75%] rounded-2xl px-4 py-3 text-sm",
+        isUser
+          ? "rounded-br-sm bg-slate-200 text-gray-900"
+          : "rounded-bl-sm text-slate-800"
+      )}
+    >
+      {!isUser && (
+        <p className="mb-1 text-[11px] font-semibold text-slate-500">
+          AI
         </p>
-    )}
-    {/** THINKING TOGGLE (Ai only ) */}
+      )}
 
+      {!isUser && message?.thinking && (
+        <div className="mb-2">
+          <button
+            onClick={() => setShowThinking((v) => !v)}
+            className="flex items-center gap-1 text-xs text-slate-500 hover:text-gray-600"
+          >
+            {showThinking ? (
+              <ChevronDown size={14} />
+            ) : (
+              <ChevronRight size={14} />
+            )}
 
+            {loading && showThinking && (
+              <Loader2
+                size={12}
+                className="ml-1 animate-spin text-slate-400"
+              />
+            )}
 
+            Thinking
+          </button>
 
-{!isUser && message?.thinking && (
-    <div className="mb-2">
-        <button
-onClick={() => setShowThinking((v) => !v)}
-className="flex items-center gap-1 text-xs text-slate-500 hover:text-gray-600"
-        >
-{showThinking ? (
-<ChevronDown size={14}/>
-): (
-<ChevronRight size={14} />
-)}
+          {showThinking && (
+            <div className="mt-2 rounded-lg border-l-2 border-slate-300 bg-slate-100 px-3 py-2 text-xs italic text-slate-500">
+              {message.thinking}
+            </div>
+          )}
+        </div>
+      )}
 
-
-{loading && showThinking && (
-    <Loader2 size={12} className="ml-1 animate-spin text-slate-400"/>
-)}
-Thinking
-        </button>
-{showThinking && (
-      <div className="mt-2 rounded-lg bg-slate-100 px-3 py-2 text-xs text-slate-500 italic border-l-2 border-slate-300">
-        {message.thinking}
-      </div>
-    )}
-
-
+      {isUser ? (
+        <p className="whitespace-pre-wrap break-words leading-relaxed">
+          {message?.content}
+        </p>
+      ) : (
+        <div className="prose prose-sm max-w-none break-words leading-relaxed">
+          <SubAgentVerticalUI agents={message?.sub_agent} />
+          <ConvertMarkdownToText text={message.content} />
+        </div>
+      )}
     </div>
-)}
-
-{isUser ? (
-    <p className="whitespace-pre-line leading-relaxed">
-{message?.content}
-    </p>
-):(
-    <div className="prose prose-sm max-w-none leading-relaxed">
-        <SubAgentVerticalUI agents={message?.sub_agent} />
-        <ConvertMarkdownToText text={message.content} />
-    </div>
-)}
-
-
-
-</div>
-       </div> 
-    )
+  </div>
+);
 
 })

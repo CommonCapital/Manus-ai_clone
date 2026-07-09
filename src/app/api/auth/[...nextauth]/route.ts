@@ -73,8 +73,6 @@ export const authOptions = {
       if (token?.redirectThreadId) {
         session.user.redirectThreadId = token.redirectThreadId;
       }
-      if (token?.access_token) session.user.access_token = token.access_token;
-      if (token?.refresh_token) session.user.refresh_token = token.refresh_token;
       console.log("[session] final session.user:", session.user);
       return session;
     },

@@ -1,1 +1,17 @@
-Michael Jordan, widely regarded as the greatest basketball player of all time, captured six NBA championships (1991‑1993, 1996‑1998) with the Chicago Bulls, earning Finals MVP honors each time. He won five regular‑season MVP awards (1988, 1991‑1993, 1996) and was a 14‑time NBA All‑Star (1985‑1993, 1996‑1998, 2002‑2003). Jordan secured ten scoring titles, leading the league in points per game from 1987‑1993 and again from 1996‑1998, and claimed two NBA steals‑leader titles (1988, 1990). Internationally, he contributed to the 1984 gold‑medal Olympic team and anchored the 1992 "Dream Team" to another gold. Key records include a career average of 30.12 points per game (the highest in NBA history), 30‑point playoff games record (30), and 55‑point game in the 1995 playoffs. His competitive legacy also features the 1991‑1993 three‑peat, the 1996‑1998 second three‑peat, and the 1992‑1993 72‑win regular season, cementing his impact on the sport.
+# Michael Jordan - Career Accomplishments
+
+- **NBA Championships:** 6 (1991–1993, 1996–1998) with Chicago Bulls
+- **NBA Most Valuable Player (MVP) Awards:** 5 (1988, 1991, 1992, 1996, 1998)
+- **NBA Finals MVP Awards:** 6 (1991–1993, 1996–1998) – record
+- **NBA Scoring Titles:** 10 (1987–1993, 1996–1998) – most in league history
+- **NBA All-Star Appearances:** 14 (1985–1993, 1996–1998, 2002, 2003)
+- **Olympic Medals:** Gold (1984 Los Angeles, 1992 Barcelona) – member of the "Dream Team"
+- **Notable Records & Achievements:**
+  - 32,292 career points (5th all‑time at retirement)
+  - Highest career regular‑season scoring average (30.1 PPG)
+  - 10× NBA All‑Defensive First Team selections
+  - 3× NBA All‑Star Game MVP
+  - First player to win NBA MVP, Finals MVP, and All‑Star MVP in the same season (1996)
+  - Inducted into the Naismith Memorial Basketball Hall of Fame (2009 as player; 2010 as contributor)
+  - Record 63 points in a playoff game and 55 points in an NBA Finals game
+  - Two Olympic gold medals

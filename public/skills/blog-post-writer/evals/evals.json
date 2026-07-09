@@ -1,0 +1,23 @@
+{
+  "skill_name": "blog-post-writer",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Write a blog post about how to get started with TypeScript for JavaScript developers. Target audience is intermediate JavaScript developers who haven't used TypeScript before. Make it a how-to guide with a friendly, encouraging tone. Target keyword: 'TypeScript for JavaScript developers'. Around 1200 words.",
+      "expected_output": "A complete how-to guide blog post with compelling headline, introduction with hook, step-by-step sections, code examples, and conclusion with CTA",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "I need a listicle blog post: '7 Best Practices for Clean Code in Python'. Target audience is beginner to intermediate Python developers. Tone should be professional but accessible. Keyword: 'clean code Python'. Make it around 1500 words with practical examples for each practice.",
+      "expected_output": "A numbered list blog post with 7 items, each with a clear subheading, explanation, code example, and practical tips",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "Create an opinion piece about why developers should write documentation. Target audience: software engineers and development teams. Tone: persuasive and slightly provocative. Keyword: 'developer documentation importance'. Length: 1000-1200 words. Include personal insights and real-world examples.",
+      "expected_output": "An opinion-style blog post with strong thesis, supporting arguments, counter-argument handling, and persuasive conclusion",
+      "files": []
+    }
+  ]
+}

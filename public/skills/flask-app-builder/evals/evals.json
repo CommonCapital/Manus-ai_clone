@@ -1,0 +1,45 @@
+{
+  "skill_name": "flask-app-builder",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Create a simple Flask web app with a home page and an about page. The home page should say 'Welcome to my Flask App' and the about page should have a brief description. Run it in a sandbox and show me the URL.",
+      "expected_output": "A working Flask application with two routes (/ and /about), templates for both pages, running in a sandbox with an accessible URL.",
+      "files": [],
+      "expectations": [
+        "The Flask app has a home route at '/'",
+        "The Flask app has an about route at '/about'",
+        "The app uses templates (not just return strings)",
+        "The app is running in a sandbox",
+        "A public URL is provided to access the app"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Build a Flask REST API with endpoints for managing a list of tasks. I need GET /api/tasks to list all tasks, POST /api/tasks to create a new task, and DELETE /api/tasks/<id> to delete a task. Store tasks in memory (no database needed). Run it in a sandbox.",
+      "expected_output": "A Flask REST API with three endpoints for task CRUD operations, running in a sandbox with accessible URL.",
+      "files": [],
+      "expectations": [
+        "GET /api/tasks returns a JSON list of tasks",
+        "POST /api/tasks creates a new task and returns 201",
+        "DELETE /api/tasks/<id> removes a task and returns 204",
+        "The API handles JSON request bodies correctly",
+        "The app is running in a sandbox with a public URL"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Create a Flask app with a contact form that has name, email, and message fields. When submitted, it should show a success message. Use Flask-WTF for form validation. Deploy it in a sandbox environment.",
+      "expected_output": "A Flask application with a contact form using Flask-WTF, proper validation, and a success page after submission.",
+      "files": [],
+      "expectations": [
+        "The contact form has name, email, and message fields",
+        "Flask-WTF is used for form handling",
+        "Form validation works (required fields, email format)",
+        "A success message/page appears after submission",
+        "CSRF protection is enabled",
+        "The app is running in a sandbox"
+      ]
+    }
+  ]
+}

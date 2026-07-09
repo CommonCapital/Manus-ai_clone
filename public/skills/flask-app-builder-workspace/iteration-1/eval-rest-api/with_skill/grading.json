@@ -1,0 +1,29 @@
+{
+  "expectations": [
+    {
+      "text": "GET /api/tasks returns a JSON list of tasks",
+      "passed": true,
+      "evidence": "Endpoint tested: wget http://127.0.0.1:8000/api/tasks returned {\"tasks\": []}"
+    },
+    {
+      "text": "POST /api/tasks creates a new task and returns 201",
+      "passed": true,
+      "evidence": "POST test created task with id a2041fd1-4d0b-4d11-8341-7bf32796c5a5 and returned 201 Created"
+    },
+    {
+      "text": "DELETE /api/tasks/<id> removes a task and returns 204",
+      "passed": true,
+      "evidence": "DELETE test returned 204 No Content, subsequent GET confirmed task was removed"
+    },
+    {
+      "text": "The API handles JSON request bodies correctly",
+      "passed": true,
+      "evidence": "POST with JSON body {\"title\": \"Buy groceries\"} correctly parsed and stored"
+    },
+    {
+      "text": "The app is running in a sandbox with a public URL",
+      "passed": true,
+      "evidence": "Sandbox ID: 4899a249-9b02-4981-81b8-0def3401c311, URL: http://127.0.0.1:41360/proxy/8000"
+    }
+  ]
+}

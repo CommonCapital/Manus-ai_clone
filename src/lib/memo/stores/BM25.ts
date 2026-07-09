@@ -1,27 +1,34 @@
-import {Document} from "@langchain/core/documents"
-import {RecursiveCharacterTextSplitter} from "@langchain/textsplitters"
+import { LLM } from "@/lib/llm/LLM";
 import { BM25Retriever } from "@langchain/community/retrievers/bm25";
+
+import { Document } from "@langchain/core/documents";
+import { RecursiveCharacterTextSplitter } from "@langchain/textsplitters";
+import { createAgent } from "langchain";
 import { extractRelevantDocument } from "./bm25Extractor";
 
-export const formatDocumentAsString = (documents: Document[]) => {
-return documents.map((doc) => doc?.pageContent).join("\n\n")
+
+export const formatDocumentsAsString = (documents:Document[]) => {
+    return documents.map((doc) => doc?.pageContent).join("\n\n");
 };
-export  async function bm25Retriever(document: string, query:string) {
+export async function bm25Retriever(document:string, query:string) {
     const newDoc = new Document({
         pageContent: document,
         metadata: {
-title: "user     :"+"DAILY_LOG_ARCHIVE"
+            title: "user   :" + "DAILY_LOG_ARCHIVE"
         }
     })
+    const docSplitter = new RecursiveCharacterTextSplitter({ chunkSize: 800, chunkOverlap: 200 });
+    const splitDocs = await docSplitter.splitDocuments([newDoc]);
 
-    const docSplitter = new RecursiveCharacterTextSplitter({chunkSize: 1000, chunkOverlap: 200 }); 
-const splitDocs = await docSplitter.splitDocuments([newDoc]);
+    const retriever = BM25Retriever.fromDocuments([...splitDocs], { k: 4 });
 
-const retriever = BM25Retriever.fromDocuments([...splitDocs], {k:4});
+    // Will return the 4 documents reranked by the BM25 algorithm
+    const data = await retriever.invoke(query);
+    
+    const docTostring = formatDocumentsAsString(data)
 
+    // const filteredData=await extractRelevantDocument(query,docTostring)
 
-const data = await retriever.invoke(query);
-const docToString = formatDocumentAsString(data)
-const filteredData=await extractRelevantDocument(query,docToString)
-return docToString
+    return docTostring
 }
+

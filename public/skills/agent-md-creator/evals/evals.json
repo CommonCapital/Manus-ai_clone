@@ -1,0 +1,23 @@
+{
+  "skill_name": "agent-md-creator",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I'm starting a new React project with TypeScript and Vite. Can you create an AGENT.md file for it? I want to use Tailwind CSS for styling and Vitest for testing.",
+      "expected_output": "AGENT.md file with React/TypeScript/Vite setup, Tailwind CSS conventions, Vitest testing commands, and appropriate boundaries",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "Create an AGENT.md for my Python FastAPI project. I use PostgreSQL, SQLAlchemy, and pytest. The project has user authentication and CRUD endpoints.",
+      "expected_output": "AGENT.md file with FastAPI/Python setup, PostgreSQL/SQLAlchemy commands, pytest testing, authentication boundaries, and CRUD patterns",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "I have a monorepo with a React frontend and Node.js backend. Help me set up AGENT.md files for both.",
+      "expected_output": "Multiple AGENT.md files - root level with shared instructions, frontend-specific AGENT.md, and backend-specific AGENT.md with nested structure guidance",
+      "files": []
+    }
+  ]
+}

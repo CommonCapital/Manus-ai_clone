@@ -3,7 +3,6 @@ import {tool} from "@langchain/core/tools";
 import {z} from "zod";
 import {v4 as uuidv4} from "uuid"
 import fs from 'fs'
-import { TruckElectricIcon } from "lucide-react";
 const ROOT = process.cwd();
 const THREAD_HISTORY_FILE = path.join(ROOT, "public", "threads")
 const HISTORY_FOLDER = path.join(ROOT, 'public', 'chat-history')
@@ -31,8 +30,8 @@ export const createdThreadHistoryTool = tool(
     async ({userId, title}) => {
         try {
 let threads: any[] = [];
-if (fs.existsSync(HISTORY_FILE)) {
-    const data = fs.readFileSync(HISTORY_FILE, "utf-8");
+if (fs.existsSync(THREAD_FILE)) {
+    const data = fs.readFileSync(THREAD_FILE, "utf-8");
     threads = JSON.parse(data);
 }
 
@@ -43,7 +42,7 @@ threads = threads.map((t: any) => {
     return t;
 });
 const newThread = {
-    userId, 
+    userId,
     threadId: uuidv4(),
     title: title || "New Threads",
     active: true,
@@ -52,7 +51,7 @@ const newThread = {
 threads.push(newThread);
 
 fs.writeFileSync(
-    HISTORY_FILE,
+    THREAD_FILE,
     JSON.stringify(threads, null, 2),
     "utf-8"
 );
@@ -80,11 +79,11 @@ return JSON.stringify(newThread);
 export const readThreadTool = tool(
     async ({userId, threadId}) => {
         try {
- if (!fs.existsSync(HISTORY_FILE)) {
+ if (!fs.existsSync(THREAD_FILE)) {
     return "[]";
  }
 
- const data = fs.readFileSync(HISTORY_FILE, "utf-8");
+ const data = fs.readFileSync(THREAD_FILE, "utf-8");
 
  const threads = JSON.parse(data);
 
@@ -107,7 +106,7 @@ export const readThreadTool = tool(
 
 
  fs.writeFileSync(
-    HISTORY_FILE,
+    THREAD_FILE,
     JSON.stringify(updatedThreads, null,2),
     "utf-8"
 
@@ -140,11 +139,11 @@ return "[]";
 export const updateThreadTitleTool = tool(
     async ({userId, threadId, title}) => {
         try {
-            if (!fs.existsSync(HISTORY_FILE)) {
+            if (!fs.existsSync(THREAD_FILE)) {
                 return "Thread file not found."
             }
 
-            const data = fs.readFileSync(HISTORY_FILE, "utf-8");
+            const data = fs.readFileSync(THREAD_FILE, "utf-8");
             const threads = JSON.parse(data);
 
             const threadIndex = threads.findIndex(
@@ -157,7 +156,7 @@ export const updateThreadTitleTool = tool(
             threads[threadIndex].title = title;
 
             fs.writeFileSync(
-                HISTORY_FILE,
+                THREAD_FILE,
                 JSON.stringify(threads, null, 2),
                 "utf-8"
             );
@@ -183,15 +182,15 @@ export const updateThreadTitleTool = tool(
 export const getAllThreadsByUserTool = tool(
     async ({userId}: {userId: string}) => {
     try {
-        if (!fs.existsSync(HISTORY_FILE)) {
-            fs.writeFileSync(HISTORY_FILE, "[]", "utf-8") ;
+        if (!fs.existsSync(THREAD_FILE)) {
+            fs.writeFileSync(THREAD_FILE, "[]", "utf-8") ;
         }
 
-        const data = fs.readFileSync(HISTORY_FILE, "utf-8");
+        const data = fs.readFileSync(THREAD_FILE, "utf-8");
         const threads = JSON.parse(data);
 
         let userThreads = threads.filter(
-            (t:any) => t.userId === userId && !("role" in t)
+            (t:any) => t.userId === userId
         );
 
 
@@ -204,17 +203,20 @@ export const getAllThreadsByUserTool = tool(
             active: true
            } ;
            threads.push(newThread)
-           fs.writeFileSync(HISTORY_FILE, JSON.stringify(threads, null,2));
+           fs.writeFileSync(THREAD_FILE, JSON.stringify(threads, null,2));
            userThreads = [newThread]
         }
        let activeThread = userThreads.find((t: any) => t.active);
 if (!activeThread) {
     activeThread = userThreads[0];
     activeThread.active = true; // already mutates the same object inside `threads`
-    fs.writeFileSync(HISTORY_FILE, JSON.stringify(threads, null, 2));
+    fs.writeFileSync(THREAD_FILE, JSON.stringify(threads, null, 2));
 }
+const sortedThreads = [...userThreads].sort(
+    (a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+);
 return {
-    threads: userThreads,
+    threads: sortedThreads,
     redirectThreadId: activeThread.threadId,
 };
 

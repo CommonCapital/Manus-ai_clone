@@ -13,8 +13,13 @@ const TODO_FILE = path.join(
     TODO_FILE_NAME
 );
 
+function resolveTodoFilename(filename: string) {
+    return filename.endsWith(".todos.json") ? filename : `${filename}.todos.json`;
+}
+
 
 const InputTaskSchema = z.object({
+    key: z.string().optional(),
     task: z.string(),
     assigned_to: z.string(),
     status: z.enum(["pending", "in_progress", "completed", "blocked"])
@@ -38,17 +43,23 @@ export const write_todos = tool(
     async ({filename, todos}, toolConfig:any) => {
         try {
             await fs.promises.mkdir(BASE_DIR, {recursive:true});
-            const readFileName = `${filename}.todos.json`
+            const readFileName = resolveTodoFilename(filename)
             const filePath = path.join(BASE_DIR, readFileName);
 
             const now = new Date().toISOString();
-            const enriched = todos.map((t) => ({
-                id: uuid(),
+            const withIds = todos.map((t) => ({...t, id: uuid()}));
+            const keyToId: Record<string, string> = {};
+            withIds.forEach((t) => {
+                if (t.key) keyToId[t.key] = t.id;
+            });
+
+            const enriched = withIds.map((t) => ({
+                id: t.id,
                 task: t.task,
                 assigned_to: t.assigned_to,
                 status: t.status ?? "pending",
-                parent_id: t.parent_id,
-                dependencies: t.dependencies ?? [],
+                parent_id: t.parent_id ? (keyToId[t.parent_id] ?? t.parent_id) : t.parent_id,
+                dependencies: (t.dependencies ?? []).map((dep) => keyToId[dep] ?? dep),
                 created_at: now,
                 updated_at: now,
             })) ;
@@ -83,13 +94,22 @@ const jsonStringTodos = JSON.stringify(enriched, null, 2)
         It is the starting point for multi-step workflows and subagent orchesration.
 
         ### Behavior
-        - **UUID generation:** Each task is assigned a system-generated "id".
+        - **UUID generation:** Each task is assigned a system-generated "id". You will NOT know this id
+          in advance, since it does not exist until this tool runs.
         - **Timestamps:** "created_at" and "updated_at" are automatically set to the current duration.
         - **Dependencies:** If not provided, dependencies defaults to an empty array.
         - **Status:** Defaults to "pending" if not specified.
         - **Parent-child hierarchy:** Supports optional "parent_id" for hierarchical workflows
         - **File naming:** "filename" is the base name; the tool appends ".todos.json"
 
+        ### Same-batch dependencies (IMPORTANT)
+        If task B depends on task A and BOTH are being created in this SAME call, you cannot know
+        task A's real id yet. Do NOT invent a placeholder id (e.g. "<ID_1>") — it will silently fail
+        to resolve. Instead:
+        1. Give task A a human-readable "key" (e.g. "research_step").
+        2. In task B's "dependencies" array, put that same string ("research_step") instead of an id.
+        The tool resolves keys to real ids automatically before saving. Only use real ids in
+        "dependencies" when referencing a task that was created in a PREVIOUS write_todos call.
 
         ### Returned Output
         The tool returns:
@@ -100,7 +120,7 @@ const jsonStringTodos = JSON.stringify(enriched, null, 2)
         2. Provide an **array of tasks** with:
         - "task" (string)
         - "assigned_to" (subagent or "me")
-        - Optional: "status", "dependencies", "parent_id"
+        - Optional: "key" (to let other tasks in this same batch depend on it), "status", "dependencies", "parent_id"
         `,
 
 
@@ -120,7 +140,7 @@ const jsonStringTodos = JSON.stringify(enriched, null, 2)
 export const read_todos = tool(
     async ({filename}:any) => {
         try {
-const filePath = path.join(BASE_DIR, filename);
+const filePath = path.join(BASE_DIR, resolveTodoFilename(filename));
 
 if (!fs.existsSync(filePath)) {
     return "No TODO list found.";
@@ -145,7 +165,8 @@ return `<think>Error reading TODO list: ${error.message}</think>`
 export const update_todos = tool(
     async ({filename, updates}, toolConfig:any) => {
         try {
-            const filePath = path.join(BASE_DIR, filename);
+            const readFileName = resolveTodoFilename(filename);
+            const filePath = path.join(BASE_DIR, readFileName);
 
             if (!fs.existsSync(filePath)) {
                 return "No TODO list found."
@@ -165,14 +186,17 @@ if (index !==-1) {
     };
 }
             });
+            const jsonStringTodos = JSON.stringify(todos, null, 2);
             await fs.promises.writeFile(
                 filePath,
-                JSON.stringify(todos, null, 2),
+                jsonStringTodos,
                 "utf8"
             );
             toolConfig.writer({
                 update_todos: "update_todos",
-                updates:updates
+                filename: readFileName,
+                updates: updates,
+                todoList: jsonStringTodos
             })
             return "<think>TODO list updated successfully.</think>"
         } catch (error:any) {
@@ -243,7 +267,7 @@ Returns:
 
 export const get_next_runnable_tasks= tool(
 async ({filename}:any) => {
-const filePath = path.join(BASE_DIR, filename);
+const filePath = path.join(BASE_DIR, resolveTodoFilename(filename));
 if (!fs.existsSync(filePath)) return "No todolist found.";
 
 const raw = await fs.promises.readFile(filePath, "utf8");
@@ -261,7 +285,9 @@ const runnable = todos.filter((t:any) => {
     return deps.every((dep:any) => {
         const depId = keyToIdMap[dep] || dep;
         const parent = todos.find((x:any) => x.id === depId);
-        return parent ? parent.status === "completed" : true;
+        // An unresolvable dependency id is a broken reference, not a satisfied one —
+        // treat it as blocking rather than silently letting the task run anyway.
+        return parent ? parent.status === "completed" : false;
     });
 });
 return JSON.stringify(runnable, null,2);
