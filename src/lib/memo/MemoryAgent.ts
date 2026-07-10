@@ -7,6 +7,7 @@ import { ContextAssembler } from "./contextAssembler";
 import { glob, grep, ls, read_file } from "../deepAgent/fsTools";
 import { retrieveRelevantLTMTool } from "./tools/retrieveLTMTool";
 import { transfertTool } from "./tools/transfertTool";
+import { MAX_MODEL_RETRIES, isRateLimitError, sleep, backoffMs } from "../deepAgent/retry";
 
 
 
@@ -110,37 +111,63 @@ export async function createMemoryAgent({
     const assembled = await contextAssembler.assemble(userInput, {});
     //  console.log('ass ========= ', assembled)
 
-
-    const agentStream = await agent.stream(
-      {
-        messages: [{ role: "user", content: assembled?.prompt }
-
-        ]
-      },
-      {
-        streamMode: "messages",
-        configurable: {
-          userId, threadId
-        }
-      },
-    )
-
-
     let fullContent = "";
+    let lastError: any = null;
 
-    for await (const [messageChunk, metadata] of agentStream) {
+    for (let attempt = 0; attempt < MAX_MODEL_RETRIES; attempt++) {
+      try {
+        const agentStream = await agent.stream(
+          {
+            messages: [{ role: "user", content: assembled?.prompt }
 
-      // if (messageChunk?.type !== 'ai') continue;
-      if (messageChunk.content) {
-        const text = messageChunk.content;
-        fullContent += text;
+            ]
+          },
+          {
+            streamMode: "messages",
+            configurable: {
+              userId, threadId
+            }
+          },
+        )
 
+        fullContent = "";
+
+        for await (const [messageChunk, metadata] of agentStream) {
+
+          // if (messageChunk?.type !== 'ai') continue;
+          if (messageChunk.content) {
+            const text = messageChunk.content;
+            fullContent += text;
+
+            config.writer({
+              manager_name: "nodeA",
+              content: text
+            });
+          }
+        }
+
+        lastError = null;
+        break;
+      } catch (error: any) {
+        lastError = error;
+
+        // ChatCerebras disables its client's own retries (maxRetries: 0), so
+        // without this a single rate-limit hit here used to kill the whole
+        // run before Assistant-2 ever got a chance to run.
+        if (!isRateLimitError(error) || attempt === MAX_MODEL_RETRIES - 1) {
+          break;
+        }
+
+        const wait = backoffMs(attempt);
         config.writer({
           manager_name: "nodeA",
-          content: text
+          content: `\n[Rate limited, retrying in ${wait / 1000}s (attempt ${attempt + 1}/${MAX_MODEL_RETRIES})...]\n`
         });
+        await sleep(wait);
       }
     }
+
+    if (lastError) throw lastError;
 
     await memoryManager.logInteraction("Assistant-1", fullContent, new Date());
 

@@ -27,6 +27,7 @@ import { searchTool, webScrapperTool } from "./searchTool";
 import { fixThinkingTags } from "../helper/fixThinkingTags";
 import { execute_code, run_app, get_app_logs, stop_app } from "./sandboxTool";
 import { take_screenshot } from "./screenshotTool";
+import { MAX_MODEL_RETRIES, isRateLimitError, sleep, backoffMs } from "./retry";
 import { buildFilesystemTools } from "../memo/tools/fileSystemTools";
 
 
@@ -96,6 +97,10 @@ ${TASK_SYSTEM_PROMPT}
     ] as any
 } as any) as any;
 
+  let lastError: any = null;
+
+  for (let attempt = 0; attempt < MAX_MODEL_RETRIES; attempt++) {
+  try {
   const agentStream = await agent.stream(
     {
       messages: [
@@ -118,13 +123,19 @@ ${TASK_SYSTEM_PROMPT}
          - analyse the skill.md carefull take into account every details
 
          If you dont identify the right skill to use just take control of that
-        step 2. Before creating a TodoList identify if a Task if complex or needs multi-step   
-        step 3. Breaking down a Task by Creating a TodoList 
+        step 2. Before creating a TodoList identify if a Task if complex or needs multi-step
+        step 3. Breaking down a Task by Creating a TodoList using write_todos YOURSELF, directly.
+            IMPORTANT: Creating/expanding/restructuring the TODO list, or "designing a workflow", is YOUR
+            OWN job via write_todos/update_todos. NEVER spawn a subagent (via the task tool) whose job is
+            to create or manage the todo list itself (e.g. do not create a subagent named "todo-creator"
+            or similar) — that just delegates planning to nowhere and stalls real progress. Only spawn
+            subagents for substantive work items: research, data gathering, coding, analysis, synthesis.
         step 4. you must update the todo List when a Task is completed
             Rules :
             step 1: use ls to list to file name
             step 2: read it, identify the task to update
-   step 5. you should not work alone it better to spawn subAgent to be efficient for complex inputs
+   step 5. you should not work alone it better to spawn subAgent to be efficient for complex inputs,
+   but ONLY for the substantive work itself (see step 3's note) — not for planning/todo-list meta-work.
    step 6. This is about Research, When researcher subAgent or SubAgent finish, DO NOT read the research files immediately. First update the todoList.
    Only read Research files during the synthesis phase.
    step7. About sandbox once you or subagents finished working should export files to sandbox-files folder.
@@ -225,9 +236,26 @@ ${TASK_SYSTEM_PROMPT}
     }
   }
 
-  // return fullContent
-  // const fixcontent = fixThinkingTags(fullContent)
   return fullContent
+  } catch (error: any) {
+    lastError = error;
 
+    // Without this, a single rate-limit hit on the manager's OWN turn (not a
+    // subagent's) used to kill the entire run outright, since ChatCerebras
+    // disables its underlying client's retries (maxRetries: 0).
+    if (!isRateLimitError(error) || attempt === MAX_MODEL_RETRIES - 1) {
+      break;
+    }
+
+    const wait = backoffMs(attempt);
+    config.writer({
+      manager_name: "nodeB",
+      content: `\n[Rate limited, retrying in ${wait / 1000}s (attempt ${attempt + 1}/${MAX_MODEL_RETRIES})...]\n`
+    });
+    await sleep(wait);
+  }
+  }
+
+  throw lastError;
 }
 

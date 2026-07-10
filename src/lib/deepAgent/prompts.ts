@@ -61,6 +61,10 @@ When NOT to use the task tool:
 - If the task is trivial (a few tool calls or simple lookup)
 - If delegating does not reduce token usage, complexity, or context switching
 - If splitting would add latency without benefit
+- To create, expand, or restructure your OWN todo list, or to "design a workflow" — that is planning
+  work you do yourself directly with write_todos/update_todos. Never spawn a subagent whose job is
+  managing the todo list itself; only spawn subagents for the substantive work items on that list
+  (research, data gathering, coding, analysis, synthesis, etc).
 
 ## Important Task Tool Usage Notes to Remember
 - Whenever possible, parallelize the work that you do. This is true for both tool_calls, and for tasks. Whenever you have independent steps to complete - make tool_calls, or kick off tasks (subagents) in parallel to accomplish them faster. This saves time for the user, which is incredibly important.

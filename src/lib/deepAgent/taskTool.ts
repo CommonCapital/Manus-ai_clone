@@ -5,26 +5,16 @@ import {DEFAULT_SUBAGENT_PROMPT, getTaskToolDescription} from "./prompts";
 
 
 import { toolMonitoringMiddleware, ToolOutputSummarizerMiddleware } from "./middleware";
+import { MAX_MODEL_RETRIES, isRateLimitError, sleep, backoffMs } from "./retry";
 
 const taskToolDescription = getTaskToolDescription()
-
-const MAX_RETRIES = 3;
-
-const isRateLimitError = (error: any) => {
-    const message = String(error?.message ?? "");
-    return error?.status === 429 || /429|rate limit/i.test(message);
-};
-
-const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
-
-
 
 export const createTaskTool = (model:any, config:any={}) => {
     return tool(
         async ({task, sub_agent}: any, toolConfig:any) => {
             let lastError: any = null;
 
-            for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
+            for (let attempt = 0; attempt < MAX_MODEL_RETRIES; attempt++) {
                 try {
                     const subagent = createAgent({
                         model,
@@ -62,16 +52,16 @@ export const createTaskTool = (model:any, config:any={}) => {
                     // Isolate this subagent's failure so it can't take down the
                     // whole graph stream (one 429 shouldn't kill every other
                     // subagent's in-flight work or the manager's downstream steps).
-                    if (!isRateLimitError(error) || attempt === MAX_RETRIES - 1) {
+                    if (!isRateLimitError(error) || attempt === MAX_MODEL_RETRIES - 1) {
                         break;
                     }
 
-                    const backoffMs = 2000 * (attempt + 1);
+                    const wait = backoffMs(attempt);
                     toolConfig.writer({
                         subagent_name: sub_agent,
-                        content: `\n[Rate limited, retrying in ${backoffMs / 1000}s (attempt ${attempt + 1}/${MAX_RETRIES})...]\n`
+                        content: `\n[Rate limited, retrying in ${wait / 1000}s (attempt ${attempt + 1}/${MAX_MODEL_RETRIES})...]\n`
                     });
-                    await sleep(backoffMs);
+                    await sleep(wait);
                 }
             }
 

@@ -65,4 +65,20 @@ Examples of statements that MUST be saved:
 
 This is REQUIRED WITHOUT the user saying “remember this”..
 
+────────────────────────────────────────────
+HANDING OFF TO ASSISTANT-2 (transfertTool)
+────────────────────────────────────────────
+
+When you call transfertTool, the "context" you pass must be the user's actual,
+concrete request — faithfully relayed, not reinterpreted.
+
+In particular: phrases like "use multiple agents", "use sub-agents", or
+"use todo tasks" describe HOW Assistant-2 should work (its method), NOT WHAT
+it should produce. Do NOT turn them into a request to build/design a
+multi-agent system, workflow document, or todo-list framework as the
+deliverable itself. If the user says "research X, use multiagency and todo
+tasks", the context you hand off should be "research X" (Assistant-2 already
+knows how to use sub-agents and todos on its own) — not "design a multi-agent
+research workflow about X".
+
 `.trim();
