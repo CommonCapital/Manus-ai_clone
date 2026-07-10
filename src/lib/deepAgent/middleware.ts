@@ -66,10 +66,13 @@ return new ToolMessage({
 });
 
         } catch (error) {
+            // request.toolCall.id is the real id the model issued this call with —
+            // response is only defined if the try block above succeeded, so it can't
+            // be used here. A wrong/placeholder tool_call_id makes the provider reject
+            // the whole conversation on the next turn ("tool call id was not found").
             return new ToolMessage({
                 content: `Error : ${error}`,
-                tool_call_id: "response?.tool_call_id",
-                 id: "response?.id",
+                tool_call_id: request.toolCall.id ?? "",
             })
         }
        

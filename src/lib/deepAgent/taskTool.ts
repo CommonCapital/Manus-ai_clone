@@ -35,6 +35,12 @@ export const createTaskTool = (model:any, config:any={}) => {
                     let finalContent = "";
 
                     for await (const [chunk, metadata] of subagentStream) {
+                        // Only stream the subagent's own reasoning/response to the user.
+                        // Tool messages (e.g. the browser-summary digests from
+                        // ToolOutputSummarizerMiddleware) are meant for the model's own
+                        // context, not user-facing chat — mirrors the same filter the
+                        // manager's own stream already applies in deepAgent.ts.
+                        if (chunk?.type !== 'ai') continue;
                         if (chunk.content) {
                             toolConfig.writer({
                                 subagent_name: sub_agent,

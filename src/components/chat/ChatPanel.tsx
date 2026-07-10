@@ -148,12 +148,16 @@ const typeNext = () => {
 
     subAgentTypingRef.current = true;
 
+    // Each queued item is a whole chunk from a (possibly different) sub-agent —
+    // not a character queue like the main message typing effect. Every item must
+    // be dispatched, or most of the streamed content silently disappears.
     const chunk = subAgentQueueRef.current
       .splice(0, 18);
 
-    const obj = chunk.pop()
+    chunk.forEach((obj) => {
+      dispatch(appendToLastAIMessageSubAgent(obj));
+    });
 
-    dispatch(appendToLastAIMessageSubAgent(obj));
     setTimeout(typeSubAgentNextContent, 4);
   };
 

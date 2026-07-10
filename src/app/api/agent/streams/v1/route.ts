@@ -42,8 +42,56 @@ export const POST = withErrorHandler(async (req: Request) => {
         await writeToChatHistoryTool.invoke({ messages: [{ role: 'user', content: message, userId, threadId, sub_agent: [] }] })
         let streamingText = ''
         let thinkingBuffer = "";
-        let inThinking = false;
         const subagentsTracker: any = [];
+
+        // LLM streams emit tiny fragments, so a "<think>"/"</think>" tag can be
+        // split across multiple chunks (e.g. "<th" then "ink>"). Splitting each
+        // chunk's content independently misses tags that straddle a chunk
+        // boundary, letting raw thinking text leak into the visible message.
+        // This carries an accumulation buffer across chunks and only emits text
+        // once we're sure it isn't the prefix of an upcoming tag.
+        const thinkParserState = { buffer: "", inThinking: false };
+        const THINK_OPEN = "<think>";
+        const THINK_CLOSE = "</think>";
+
+        function extractThinkEvents(newContent: string) {
+            thinkParserState.buffer += newContent;
+            const events: { thinking: boolean; text: string }[] = [];
+
+            while (true) {
+                const tag = thinkParserState.inThinking ? THINK_CLOSE : THINK_OPEN;
+                const idx = thinkParserState.buffer.indexOf(tag);
+
+                if (idx === -1) {
+                    // No complete tag yet — hold back any trailing text that could
+                    // still turn into the tag we're looking for, emit the rest.
+                    let holdback = 0;
+                    const maxHoldback = Math.min(tag.length - 1, thinkParserState.buffer.length);
+                    for (let i = maxHoldback; i > 0; i--) {
+                        if (tag.startsWith(thinkParserState.buffer.slice(thinkParserState.buffer.length - i))) {
+                            holdback = i;
+                            break;
+                        }
+                    }
+
+                    const emitLength = thinkParserState.buffer.length - holdback;
+                    if (emitLength > 0) {
+                        events.push({ thinking: thinkParserState.inThinking, text: thinkParserState.buffer.slice(0, emitLength) });
+                        thinkParserState.buffer = thinkParserState.buffer.slice(emitLength);
+                    }
+                    break;
+                }
+
+                const before = thinkParserState.buffer.slice(0, idx);
+                if (before.length > 0) {
+                    events.push({ thinking: thinkParserState.inThinking, text: before });
+                }
+                thinkParserState.buffer = thinkParserState.buffer.slice(idx + tag.length);
+                thinkParserState.inThinking = !thinkParserState.inThinking;
+            }
+
+            return events;
+        }
 
 
         const stream = new ReadableStream({
@@ -149,28 +197,19 @@ export const POST = withErrorHandler(async (req: Request) => {
 
                             const content = (chunk as any)?.content;
 
-                            
-                            const parts: any = content.split(/(<think>|<\/think>)/);
+                            const events = extractThinkEvents(content ?? "");
 
-                            // 2. Iterate through each part sequentially
-                            parts.forEach((part:any) => {
-                                if (part === "<think>") {
-                                    inThinking = true;
-                                } else if (part === "</think>") {
-                                    inThinking = false;
-                                } else if (part.length > 0) {
-                                    // 3. Route the content based on the current state
-                                    if (inThinking) {
-                                        thinkingBuffer += part;
-                                        controller.enqueue(
-                                            sse("thinking", { thinking: part })
-                                        );
-                                    } else {
-                                        streamingText += part;
-                                        controller.enqueue(
-                                            sse("message", { message: part })
-                                        );
-                                    }
+                            events.forEach((event) => {
+                                if (event.thinking) {
+                                    thinkingBuffer += event.text;
+                                    controller.enqueue(
+                                        sse("thinking", { thinking: event.text })
+                                    );
+                                } else {
+                                    streamingText += event.text;
+                                    controller.enqueue(
+                                        sse("message", { message: event.text })
+                                    );
                                 }
                             });
 
