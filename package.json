@@ -1,6 +1,21 @@
 {
-  "name": "my-app",
+  "name": "manus-ai-clone",
   "version": "0.1.0",
+  "description": "An open-source clone of Manus-style AI agents built on Next.js, LangChain, and LangGraph.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/CommonCapital/Manus-ai_clone.git"
+  },
+  "keywords": [
+    "ai-agent",
+    "langchain",
+    "langgraph",
+    "nextjs",
+    "manus",
+    "multi-agent",
+    "llm"
+  ],
   "private": true,
   "scripts": {
     "dev": "next dev -p 8000",
