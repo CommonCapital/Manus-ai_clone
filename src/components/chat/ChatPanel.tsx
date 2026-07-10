@@ -27,7 +27,7 @@ export default function ChatPanel({ threadId }: { threadId: string }) {
 
 
   const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const userId = session?.user?.id
+  const userId = session?.user?.id as any
 
   const dispatch = useDispatch<AppDispatch>();
 
@@ -154,8 +154,8 @@ const typeNext = () => {
     const chunk = subAgentQueueRef.current
       .splice(0, 18);
 
-    chunk.forEach((obj) => {
-      dispatch(appendToLastAIMessageSubAgent(obj));
+    chunk.forEach((obj):any => {
+      dispatch(appendToLastAIMessageSubAgent(obj as any));
     });
 
     setTimeout(typeSubAgentNextContent, 4);

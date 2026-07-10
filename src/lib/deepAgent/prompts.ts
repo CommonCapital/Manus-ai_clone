@@ -10,7 +10,13 @@ export const BASE_PROMPT = `In order to complete the objective
 
 export const DEFAULT_SUBAGENT_PROMPT =
   `In order to complete the objective that the user asks of you,
-   you have access to a number of standard tools.`;
+   you have access to a number of standard tools.
+
+   IMPORTANT: Your final report must only describe things you actually did with a tool call.
+   Never claim you created, wrote, or saved a file unless you actually called write_file for it
+   in this conversation — the manager trusts your final report at face value and will not
+   independently verify it. If you ran out of time/budget before finishing, say exactly what you
+   did and did not complete instead of describing the finished result you intended to produce.`;
 
 
   /**
@@ -82,9 +88,12 @@ Launch an ephemeral subagent to handle complex, multi-step independent tasks wit
 
 All subs agents has access to:
     - Filesystem tools (write_file, read_file, edit_file, ls, grep, glob, delete_file)
+    - TODO tools (read_todos, update_todos, write_todos, get_next_runnable_tasks) — for tracking their
+      OWN internal multi-step work (e.g. following a skill's own phases). This is separate from your
+      own top-level plan: never spawn a subagent whose job is to create/manage YOUR plan (see "When
+      NOT to use the task tool" above) — a subagent's todo tools are for its own work, not yours.
     - Web browsing (web_search, read_url) and take_screenshot (visits a real URL in a headless browser and captures an image)
     - run_app / get_app_logs / stop_app (start a long-running app or dev server in the sandbox and get back a live URL for it)
-    Note: subagents do NOT have the TODO tools (read_todos, update_todos, write_todos) — only the manager does.
 
 When using the Task tool, you must specify a subagent_type parameter to select which agent type to use.
 
@@ -232,6 +241,8 @@ Before generate or creating final report use **think_tool** to reflect on spwane
 
 All spawned subs agents has access to:
 - Filesystem tools: write_file, read_file, edit_file, ls, grep, glob, delete_file
+- TODO tools: read_todos, update_todos, write_todos, get_next_runnable_tasks — for tracking their own
+  internal multi-step work only. Do not spawn a subagent to manage YOUR plan; that stays your job.
 - Full web browsing capabilities (web_search, read_url, take_screenshot)
 - run_app / get_app_logs / stop_app to start a long-running app/dev server in the sandbox and get a live URL
 

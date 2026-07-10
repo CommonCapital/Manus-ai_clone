@@ -61,6 +61,12 @@ export class LLM {
         temperature: 0.7,
         apiKey: process.env.CEREBRAS_API_KEY,
     });
+    // @langchain/cerebras hardcodes maxRetries: 0 on its underlying HTTP client,
+    // disabling retries entirely (unlike ChatFireworks, which retries by default).
+    // The Cerebras SDK client itself reads this fresh on every request, so
+    // mutating it post-construction is sufficient — it also correctly retries
+    // only on 429/5xx and respects the server's Retry-After header.
+    (LLM.instances[type] as any).client.maxRetries = 4;
     break;
 
         default:
@@ -71,9 +77,4 @@ export class LLM {
     return LLM.instances[type];
   }
 }
-
-
-export const cerebrasModel=LLM.getInstance('cerebras')
-
-export const fireworksModel=LLM.getInstance('fireworks')
 

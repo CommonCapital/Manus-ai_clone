@@ -22,13 +22,18 @@ export const POST = withErrorHandler(async (req: Request) => {
         const { logLastAIMsg } = await createMemoryAgent({ model: llm, userId, threadId })
 
 
+        // req.signal fires when the client disconnects (reload, navigation, tab
+        // close). Without threading it through, the graph run kept executing
+        // fully orphaned in the background — still calling tools, still burning
+        // API quota — with nothing to stop it, and it would eventually throw
+        // trying to write to the now-dead stream controller.
         const graphStream = await graph.stream(
             {
                 messages: [{ role: "user", content: message }],
                 userId, threadId
             },
 
-            { streamMode: "custom", subgraphs: true ,recursionLimit:150}
+            { streamMode: "custom", subgraphs: true, recursionLimit: 150, signal: req.signal }
         );
 
 
@@ -42,6 +47,7 @@ export const POST = withErrorHandler(async (req: Request) => {
         await writeToChatHistoryTool.invoke({ messages: [{ role: 'user', content: message, userId, threadId, sub_agent: [] }] })
         let streamingText = ''
         let thinkingBuffer = "";
+        let streamClosed = false;
         const subagentsTracker: any = [];
 
         // LLM streams emit tiny fragments, so a "<think>"/"</think>" tag can be
@@ -224,14 +230,28 @@ export const POST = withErrorHandler(async (req: Request) => {
                     }
 
 
-                    controller.enqueue(sse("end", { ok: true }));
+                    if (!streamClosed) {
+                        controller.enqueue(sse("end", { ok: true }));
+                        streamClosed = true;
+                        controller.close();
+                    }
                     await writeToChatHistoryTool.invoke({ messages: [{ role: 'ai', thinking: thinkingBuffer, content: streamingText, userId, threadId, sub_agent: subagentsTracker }] })
-                    controller.close()
 
 
                 } catch (error) {
-                    console.log('Error ', (error as Error)?.message)
-                    controller.enqueue(sse("error", { error: (error as Error).message }));
+                    // If the client already disconnected (cancel() below already
+                    // ran), the controller is dead — don't try to enqueue/close it
+                    // again, that's its own separate crash.
+                    if (!streamClosed) {
+                        console.log('Error ', (error as Error)?.message)
+                        try {
+                            controller.enqueue(sse("error", { error: (error as Error).message }));
+                        } catch { /* controller already closed underneath us */ }
+                        streamClosed = true;
+                        try { controller.close(); } catch { /* already closed */ }
+                    } else {
+                        console.log('Run ended after client disconnected:', (error as Error)?.message)
+                    }
 
                     // Persist whatever streamed through before the failure so a
                     // crashed turn doesn't vanish from chat history on refresh.
@@ -248,9 +268,15 @@ export const POST = withErrorHandler(async (req: Request) => {
                     } catch (persistError) {
                         console.log('Failed to persist chat history after error', (persistError as Error)?.message)
                     }
-
-                    controller.close();
                 }
+            },
+            cancel(reason) {
+                // Client disconnected (reload/navigation/tab close). req.signal
+                // being aborted is what actually stops graph.stream() from doing
+                // further work; this just marks the controller dead so the loop
+                // above doesn't try to enqueue/close it again once that happens.
+                streamClosed = true;
+                console.log('Stream cancelled by client:', reason);
             },
         });
 

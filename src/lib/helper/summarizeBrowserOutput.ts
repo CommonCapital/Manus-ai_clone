@@ -4,6 +4,10 @@ import { estimateTokens } from "../memo/contextAssembler"
 const summarizationModel = LLM.getInstance("cerebras");
 const MAX_CONTENT_TOKENS = 15000
 const MAX_TRUNCATED_TOKENS = 30000
+// Below this, an LLM summarization pass costs more (a whole extra request) than
+// it saves — every web_search/read_url call was paying for a second LLM call
+// regardless of how small the page content actually was.
+const SKIP_SUMMARY_BELOW_TOKENS = 300
 export async function summarizeBrowserOutput(input: unknown): Promise<string> {
     if (typeof input !== "string") {
         return ""    }
@@ -17,6 +21,9 @@ export async function summarizeBrowserOutput(input: unknown): Promise<string> {
         .replace(/\s{2,}/g, " ")
         .trim()
 
+        if (estimated < SKIP_SUMMARY_BELOW_TOKENS) {
+            return text;
+        }
 
         if (estimated > MAX_CONTENT_TOKENS) {
             const approxChars = MAX_TRUNCATED_TOKENS * 4;

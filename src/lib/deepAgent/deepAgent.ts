@@ -3,7 +3,6 @@ import fs from "node:fs";
 import path from "node:path";
 
 import { tool, createAgent, createMiddleware } from "langchain";
-import { ChatCerebras } from "@langchain/cerebras";
 import {
   // BaseMessage,
   SystemMessage,
@@ -54,7 +53,7 @@ const model = LLM.getInstance("cerebras")
 
 
 const subagentConfigs = {
-  tools: [...filesystemTools,
+  tools: [...filesystemTools, ...todoListTools,
   // ...mcpTools,
     // SendImageToAgentComputer,
     searchTool,
@@ -82,11 +81,10 @@ ${TASK_SYSTEM_PROMPT}
     tools: [...filesystemTools, ...todoListTools, execute_code, run_app, get_app_logs, stop_app, take_screenshot, think_tool, createTaskTool(model, subagentConfigs), searchTool, webScrapperTool] as any,
     middleware: [
         summarizationMiddleware({
-            model: new ChatCerebras({
-                model: "gpt-oss-120b",
-                temperature: 0.7,
-                apiKey: process.env.CEREBRAS_API_KEY,
-            }),
+            // Reuse the shared, retry-patched instance instead of constructing a
+            // separate ChatCerebras client (which would default back to
+            // maxRetries: 0). This one only summarizes text, no tools needed.
+            model,
             trigger: [
                 {tokens: 8000, messages: 15},
                 {tokens: 10000}
