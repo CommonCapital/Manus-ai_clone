@@ -21,16 +21,6 @@ const llm = LLM.getInstance("cerebras")
 
 
 
-function removeThinkTag(input: string) {
-    if (!input) return "";
-
-    return input
-        .replace(/<\/?think>/gi, "")   // remove <think> tags
-        .replace(/__TRANSFER__/gi, "") // remove __TRANSFER__
-        .replace(/^\s*\+\s*/, "")      // remove leading "+"
-        .trim();
-}
-
 // 1. Define the Graph State
 const StateAnnotation = Annotation.Root({
     ...MessagesAnnotation.spec,
@@ -38,6 +28,7 @@ const StateAnnotation = Annotation.Root({
     userId: Annotation(),
     nextNode: Annotation(),
 deepAgentContext: Annotation(),
+transferContext: Annotation(),
 });
 
 // 2. Define the Nodes
@@ -52,21 +43,19 @@ const nodeA = async (state: any, config: any) => {
 
     const { runAgent, logLastAIMsg, streamAgentV1 } = await createMemoryAgent({ model: llm, userId, threadId })
 
-    const {fullContent,context:deepAgentContext} = await streamAgentV1(last?.content, config)
+    const { fullContent, transferContext, deepAgentContext } = await streamAgentV1(last?.content, config)
 
     console.log('=====In Graph full============ ')
 
-
-    const shouldHandoff = (
-        fullContent.includes("__TRANSFER__")
-    );
-
-
-
+    // Deterministic: transferContext is only set when transfertTool actually
+    // ran and its result was parsed successfully — not a text-pattern match
+    // on whatever the model happened to say, which was unreliable (the model
+    // would inconsistently echo/duplicate/mangle the old handoff template).
+    const shouldHandoff = transferContext !== null && transferContext !== undefined;
 
     if (shouldHandoff) {
         return new Command({
-            update: { messages: [new AIMessage(fullContent)] ,deepAgentContext:deepAgentContext},
+            update: { messages: [new AIMessage(fullContent)], deepAgentContext, transferContext },
             goto: "nodeB",
         });
     }
@@ -84,20 +73,12 @@ const nodeB = async (state: any, config: any) => {
     const memoryRoot = path.resolve(process.cwd(), "public", "memory")
     const memoryManager = new MemoryManager(memoryRoot, { userId, threadId });
 
-
-
-    const last = state.messages
-        .filter((m:any) => m._getType() === "ai")
-        .slice(-1)[0];
-
-    const cleanMessage = removeThinkTag(last?.content)
-
     const deepAgentMessage=`
-    From message from Assistant-1 on behalf of the user : ${cleanMessage}\n\n
-    ${state.deepAgentContext}`
+    User's request (relayed by Assistant-1): ${state.transferContext}\n\n
+    ${state.deepAgentContext ?? ""}`
 
     // console.log('===========deep agent====',deepAgentMessage)
-    
+
 const aiMessage = await testDeepAgent(`${deepAgentMessage}`, config) as any
 
     await memoryManager.logInteraction("Assistant-2", aiMessage, new Date());

@@ -34,7 +34,8 @@ export class LLM {
             throw new Error("FIRE_WORKS_API_KEY is not set");
           }
           LLM.instances[type] = new ChatFireworks({
-            model: "accounts/fireworks/models/minimax-m2p5",
+            // Verified live against this account's key (minimax-m2p5 → 404).
+            model: "accounts/fireworks/models/minimax-m3",
             temperature: 0.7,
             apiKey:process.env.FIRE_WORKS_API_KEY,
           });
@@ -45,7 +46,8 @@ export class LLM {
             throw new Error("FIRE_WORKS_API_KEY is not set");
           }
           LLM.instances[type] = new ChatFireworks({
-            model: "accounts/fireworks/models/glm-5",
+            // Verified live against this account's key (glm-5 → 404).
+            model: "accounts/fireworks/models/glm-5p2",
             temperature: 0.7,
             apiKey:process.env.FIRE_WORKS_API_KEY,
           });
@@ -57,7 +59,10 @@ export class LLM {
         throw new Error("CEREBRAS_API_KEY is not set");
     }
     LLM.instances[type] = new ChatCerebras({
-        model: "gpt-oss-120b", // or whichever Cerebras model you intend to use
+        // GLM-4.7 on Cerebras (used for Assistant-1, the memory router) — matches
+        // the reference setup and is far stronger at instruction-following than
+        // gpt-oss-120b. Verified live against this account's key (both 200).
+        model: "zai-glm-4.7",
         temperature: 0.7,
         apiKey: process.env.CEREBRAS_API_KEY,
     });

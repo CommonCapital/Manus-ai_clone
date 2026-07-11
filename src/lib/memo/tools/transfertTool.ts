@@ -1,29 +1,29 @@
 import { tool } from "@langchain/core/tools";
 import z from "zod";
-/**
- * Strategic reflection tool for research planning.
- */
+
+// A fixed, code-generated marker — never something the model has to type out.
+// The handoff to Assistant-2 is detected by finding this tool's own result in
+// the message stream, not by asking the model to echo a template (including
+// literal <think> tags) back as its own next message. That echo approach was
+// unreliable: the model would sometimes duplicate it, sometimes drop the
+// tags, sometimes paste the tool's own instructional text as if it were
+// content for the user — all of which leaked into the visible chat.
+export const TRANSFER_MARKER = "__ASSISTANT_2_HANDOFF__";
+
 export const transfertTool = tool(
-  async ({ context }, config) => {
-    return `Return this to the user then transfert will be initiate <think>__TRANSFER__ + ${context}</think>`;
+  async ({ context }) => {
+    return JSON.stringify({ marker: TRANSFER_MARKER, context });
   },
   {
     name: "transfertTool",
-    description: `this tool allows you to transfert control to Assistant-2.
-    you sould return this to the user to as final response to initial transfert
-    eg:
-    <think>__TRANSFER__ +
-    The user wants you to check the example folder for the multi-agent-builder skill. They noticed that in some examples, there's a tool object passed to an agent but the icon prop for image is missing. Please investigate the example files and identify 
-    where the icon prop is missing from tool objects that are passed to agents.
-    </think>
-    Note you should respect this format:
+    description: `Call this when the user's request needs real work that only Assistant-2 (the deep agent) can do — research, coding, file operations, running code, or web browsing.
 
-    <think>__TRANSFER__ + context 
-    </think>
-    `,
+Pass the user's actual request as "context", relayed faithfully — do not reinterpret it (e.g. don't turn "use multiple agents" into a request to build a multi-agent system).
+
+After calling this tool, do not say anything else: do not narrate the transfer, do not echo this tool's result, do not tell the user you're handing them off. The handoff happens automatically and silently — any text you add after calling this tool is wasted and will not be shown.`,
     schema: z.object({
       context: z.string().describe(
-        "Context to Transfert to assistant-2"
+        "The user's actual request, relayed faithfully — not reinterpreted"
       ),
     }),
   }

@@ -1,7 +1,12 @@
 
 import { LLM } from "../llm/LLM"
 import { estimateTokens } from "../memo/contextAssembler"
-const summarizationModel = LLM.getInstance("cerebras");
+// Browser-output summarization is the single highest-volume LLM call in the
+// system — it fires on EVERY web_search / read_url, and a research run makes
+// dozens. Keeping it on the fast MiniMax worker model (not Cerebras
+// gpt-oss-120b, whose collapses/rate-limits were the bottleneck) is what lets a
+// research subagent churn through many pages and produce many report files fast.
+const summarizationModel = LLM.getInstance("fireworks_minimax");
 const MAX_CONTENT_TOKENS = 15000
 const MAX_TRUNCATED_TOKENS = 30000
 // Below this, an LLM summarization pass costs more (a whole extra request) than
@@ -30,6 +35,10 @@ export async function summarizeBrowserOutput(input: unknown): Promise<string> {
             text = text.slice(0, approxChars);
 
         }
+        // "internal_summary" marks this call so the stream loops can route its
+        // tokens to the right surface (manager: collapsed Thinking panel;
+        // subagent: its dropdown) instead of the main chat, where they used to
+        // appear as if the agent said them. Still visible — just not as chat.
         const summaryResponse = await summarizationModel.invoke([
             [
                 "system",
@@ -66,7 +75,7 @@ export async function summarizeBrowserOutput(input: unknown): Promise<string> {
                 `,
             ],
             ["user", text]
-        ]);
+        ], { tags: ["internal_summary"] });
 
         return summaryResponse?.content ?? ""
 }

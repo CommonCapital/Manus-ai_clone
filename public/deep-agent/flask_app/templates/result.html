@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Result – {{ algo }}</title>
+    <style>
+        body {font-family: Arial, sans-serif; margin: 2rem;}
+        pre {background:#f4f4f4; padding:1rem;}
+    </style>
+</head>
+<body>
+    <h1>Result for {{ algo }}</h1>
+    {% if error %}
+        <p style="color:red;">{{ error }}</p>
+    {% else %}
+        <pre>{{ result | safe }}</pre>
+    {% endif %}
+    <a href="/">← Back to home</a>
+</body>
+</html>

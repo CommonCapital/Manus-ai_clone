@@ -57,6 +57,18 @@ export default function ChatPanel({ threadId }: { threadId: string }) {
   const subAgentQueueRef = useRef<Record<string, any>[]>([]);
   const subAgentTypingRef = useRef(false);
 
+  // One live stream at a time. Without this, sending a new message while a
+  // previous run is still streaming leaves BOTH streams dispatching into the
+  // same Redux store — the old run's todo/sub-agent/file events keep
+  // overwriting the new run's UI state (stale task list, phantom progress),
+  // and the old run keeps burning API quota in the background. Aborting the
+  // fetch also cancels the server-side graph run via req.signal.
+  const streamAbortRef = useRef<AbortController | null>(null);
+
+  useEffect(() => {
+    return () => streamAbortRef.current?.abort();
+  }, []);
+
   const typeNextThinking = () => {
     if (thinkingQueueRef.current.length === 0) {
       thinkingTypingRef.current = false;
@@ -185,6 +197,12 @@ const typeNext = () => {
       })
     );
 
+    // Kill any still-open previous stream before starting a new one — this
+    // also cancels its server-side run (route.ts threads req.signal into
+    // graph.stream), so the old run stops instead of running orphaned.
+    streamAbortRef.current?.abort();
+    const abortController = new AbortController();
+    streamAbortRef.current = abortController;
 
     try {
       setLoading(true)
@@ -196,6 +214,7 @@ const typeNext = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ message: userMessage, userId, threadId }),
+        signal: abortController.signal,
       });
 
       if (!res.body) return;
@@ -282,6 +301,16 @@ const typeNext = () => {
 
                 dispatch(clearTodos())
                 dispatch(addTodos(jsonPayload))
+
+                // Same as update_todo below: mirror it into the file viewer so
+                // the todo file shows up in Agent Computer from the moment it's
+                // created, not just after the first later update.
+                if (data?.todo_list?.filename) {
+                  dispatch(addAgentFile({
+                    filename: data.todo_list.filename,
+                    content: data.todo_list.todoList
+                  }))
+                }
               } catch (error) {
                 console.log('failed to parse todos')
               }
@@ -354,12 +383,20 @@ const typeNext = () => {
         }
       }
     } catch (err) {
+      // A superseded stream (aborted because a newer message was sent) is not
+      // an error — and it must not touch loading state that now belongs to the
+      // newer stream.
+      if ((err as Error)?.name === "AbortError") return;
       setLoading(false)
        dispatch(subAgentWorking(false))
       console.error("Fetch streaming error:", (err as Error).message);
     } finally {
-       dispatch(subAgentWorking(false))
-      setLoading(false)
+      // Only the latest send owns the loading flags; an older, aborted
+      // invocation finishing late must not reset them mid-run.
+      if (streamAbortRef.current === abortController) {
+        dispatch(subAgentWorking(false))
+        setLoading(false)
+      }
     }
   };
 

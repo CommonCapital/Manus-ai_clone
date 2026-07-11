@@ -15,7 +15,11 @@ export const POST = withErrorHandler(async (req: Request) => {
 
         const { message, userId, threadId }: { message: string, userId: string, threadId: string } = await req.json();
 
-        const llm = LLM.getInstance("cerebras")
+        // Matches the reference setup: this helper instance backs thread-title
+        // generation and last-message logging (not the graph's own nodes, which
+        // instantiate their own models). Fireworks GLM here keeps it off the
+        // Cerebras path entirely.
+        const llm = LLM.getInstance("fireworks_glm")
 
 
 
@@ -171,6 +175,7 @@ export const POST = withErrorHandler(async (req: Request) => {
 
                             const todo_list = {
                                 todos: chunk?.todos,
+                                filename: chunk?.filename,
                                 todoList: chunk?.todoList
                             };
                             controller.enqueue(sse("todo_list", {

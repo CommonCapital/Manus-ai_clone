@@ -73,11 +73,26 @@ const jsonStringTodos = JSON.stringify(enriched, null, 2)
 
             toolConfig.writer({
                 todos: "todos",
+                filename: readFileName,
                 todoList: jsonStringTodos
             })
 
+            // Deterministic nudge at the exact moment a no-delegation plan is
+            // created: a manager that assigns every task to itself never spawns
+            // subagents, bloats its own context, and defeats the architecture.
+            const selfAssigned = enriched.filter((t) => t.assigned_to === "me").length;
+            const warning =
+                enriched.length >= 3 && selfAssigned === enriched.length
+                    ? `WARNING: every task is assigned to "me". Substantive tasks (research, coding, ` +
+                      `implementation, running/verifying apps) should be assigned to named subagents and ` +
+                      `executed via the task tool with todo_filename + todo_id. Reserve "me" for planning, ` +
+                      `coordination, and final synthesis only. Rewrite the plan with proper assignments ` +
+                      `unless the user explicitly asked you to work alone.`
+                    : undefined;
+
             return `<think>${JSON.stringify({
     message: `TODO list saved file name: ${readFileName}`,
+    ...(warning ? { warning } : {}),
     tasks: enriched
 })}</think>`
         } catch(error:any) {
@@ -119,7 +134,11 @@ const jsonStringTodos = JSON.stringify(enriched, null, 2)
         1. Provide a **base filename** (without extension).
         2. Provide an **array of tasks** with:
         - "task" (string)
-        - "assigned_to" (subagent or "me")
+        - "assigned_to": the name of the subagent that will execute this task (e.g. "researcher",
+          "flask_builder", "app_runner"). This is a COMMITMENT, not a label — every task assigned to
+          a subagent name MUST later be executed by spawning that subagent via the task tool
+          (passing todo_filename + todo_id). Use "me" ONLY for planning, coordination, and final
+          synthesis tasks — never for substantive work like research, coding, or running apps.
         - Optional: "key" (to let other tasks in this same batch depend on it), "status", "dependencies", "parent_id"
         `,
 

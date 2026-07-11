@@ -49,7 +49,17 @@ import { buildFilesystemTools } from "../memo/tools/fileSystemTools";
 
 
 
-const model = LLM.getInstance("cerebras")
+// Role-split model routing, matching the known-good reference setup:
+//  - Manager/orchestrator: GLM-5 — strong at multi-step planning + tool calls.
+//  - Subagents + summarizers: MiniMax — a fast, cheap, strong-tool-calling
+//    worker model. Subagents do the high-volume work (dozens of web_search/
+//    read_url calls, each writing a report file), so a FAST model here is what
+//    makes the run generate many summaries quickly instead of crawling.
+// Both are on Fireworks (working retries, separate quota from Cerebras). The
+// old setup ran everything on Cerebras gpt-oss-120b, whose tool-calling
+// collapses — that was the real cause of "subagents don't run / it's slow".
+const managerModel = LLM.getInstance("fireworks_glm")
+const workerModel = LLM.getInstance("fireworks_minimax")
 
 
 const subagentConfigs = {
@@ -70,7 +80,7 @@ export async function testDeepAgent(userInput: string, config: any) {
 
 
 const agent = createAgent({
-    model: model,
+    model: managerModel,
     systemPrompt: `
     <system>
 ${basePrompt}
@@ -78,18 +88,29 @@ ${basePrompt}
 ${TASK_SYSTEM_PROMPT}
     </system>
     `,
-    tools: [...filesystemTools, ...todoListTools, execute_code, run_app, get_app_logs, stop_app, take_screenshot, think_tool, createTaskTool(model, subagentConfigs), searchTool, webScrapperTool] as any,
+    tools: [...filesystemTools, ...todoListTools, execute_code, run_app, get_app_logs, stop_app, take_screenshot, think_tool, createTaskTool(workerModel, subagentConfigs), searchTool, webScrapperTool] as any,
     middleware: [
         summarizationMiddleware({
-            // Reuse the shared, retry-patched instance instead of constructing a
-            // separate ChatCerebras client (which would default back to
-            // maxRetries: 0). This one only summarizes text, no tools needed.
-            model,
+            // Context compaction runs on the fast worker model (MiniMax), not the
+            // manager — it's a cheap "summarize these messages" call, no reason to
+            // burn the heavier orchestrator model on it.
+            //
+            // The "internal_summary" tag is load-bearing: LangGraph's messages-mode
+            // stream handler emits chunks from EVERY chat-model call inside the
+            // graph — including this internal summarizer. The stream loop below
+            // detects this tag and routes those chunks to the collapsed Thinking
+            // panel (wrapped in <think> tags) instead of the main chat, where
+            // they used to appear as if the agent said them ("User task: ...
+            // Procedural constraints..."). Still visible — just in the right place.
+            model: workerModel.withConfig({ tags: ["internal_summary"] }),
+            // 8000 tokens was far too aggressive for this workload: a single
+            // subagent result plus two SKILL.md reads exceeds it, so compaction
+            // fired mid-plan and scrambled the manager's working context.
+            // gpt-oss-120b on Cerebras has a ~131k context window.
             trigger: [
-                {tokens: 8000, messages: 15},
-                {tokens: 10000}
+                {tokens: 40000}
             ],
-            keep: {messages: 20}
+            keep: {messages: 30}
         }),
         ToolOutputSummarizerMiddleware
     ] as any
@@ -128,15 +149,40 @@ ${TASK_SYSTEM_PROMPT}
             to create or manage the todo list itself (e.g. do not create a subagent named "todo-creator"
             or similar) — that just delegates planning to nowhere and stalls real progress. Only spawn
             subagents for substantive work items: research, data gathering, coding, analysis, synthesis.
-        step 4. you must update the todo List when a Task is completed
-            Rules :
-            step 1: use ls to list to file name
-            step 2: read it, identify the task to update
+            ASSIGNMENT RULE (both directions matter):
+            - In the plan, assign every substantive task (research, coding, implementation, running/
+              verifying apps) to a NAMED subagent — "me" is reserved for planning, coordination, and
+              final synthesis only. A plan where everything is assigned to "me" is wrong: you are an
+              orchestrator, and doing all the work yourself bloats your context and defeats the system.
+            - "assigned_to" is a commitment: when you reach a task assigned to a subagent name, you MUST
+              execute it by spawning that subagent with the task tool (passing todo_filename + todo_id) —
+              not by quietly doing it yourself.
+        step 4. TODO status lifecycle — every task goes pending → in_progress → completed. Never jump
+        straight from pending to completed, and never leave a finished task un-updated:
+            - Tasks you DELEGATE to a subagent: pass todo_filename + todo_id to the task tool. The
+              system then updates that task's status automatically (in_progress on spawn, completed
+              on return, blocked on failure) — you don't call update_todos for these at all.
+            - Tasks assigned to "me" (you do them yourself): call update_todos to set in_progress as
+              the FIRST action when you start it, and completed IMMEDIATELY when you finish it —
+              before starting anything else.
    step 5. you should not work alone it better to spawn subAgent to be efficient for complex inputs,
    but ONLY for the substantive work itself (see step 3's note) — not for planning/todo-list meta-work.
-   step 6. This is about Research, When researcher subAgent or SubAgent finish, DO NOT read the research files immediately. First update the todoList.
+   step 6. If you ever notice a task with a real finished result that still shows "pending" or
+   "in_progress" in the todo file, fix its status immediately before doing anything else — a stale
+   todo file means the user's progress panel is lying to them.
    Only read Research files during the synthesis phase.
    step7. About sandbox once you or subagents finished working should export files to sandbox-files folder.
+   step8. CRITICAL — do not claim a task is done unless you actually did it. Before writing your final
+   summary, re-read the todo file and check every task's real status. If you said in your own words that
+   you "ran", "verified", or "launched" something (e.g. run_app), that is only true if you actually called
+   that tool this conversation and got a real result back — not if you only described the plan to call it.
+   If you ran out of turns/budget before finishing something, say exactly that and mark the task
+   "pending" or "blocked" — a false "completed" is worse than an honest "not done yet".
+   step9. NEVER stop mid-plan to ask the user for permission to continue. The user already approved
+   the whole job by asking for it; every task in your todo list is pre-approved. Ending your turn with
+   "let me know if you'd like to proceed with the pending steps" while tasks are still pending is a
+   failure — the user cannot reply into a finished run, so the work just dies. Keep executing until
+   every task is completed or genuinely blocked, and only then write your final summary.
    userInput:${userInput}
    
    </user_instructions>
@@ -216,25 +262,74 @@ ${TASK_SYSTEM_PROMPT}
 
 
     },
-    { streamMode: "messages" }
+    // createAgent's own ReAct loop is a LangGraph pregel loop with its own
+    // recursion limit, defaulting to 25 steps if unset — completely separate
+    // from the outer graph's recursionLimit:150 in route.ts. A real multi-part
+    // task (read a skill, plan, spawn 2+ subagents, verify) easily exceeds 25
+    // steps; once hit, the agent stops actually calling tools and starts
+    // narrating what it would have done instead, then reports false success.
+    { streamMode: "messages", recursionLimit: 100 }
   );
 
-  let fullContent = "";
+  // Leak-proof by construction: every manager turn streams live into the
+  // collapsed Thinking panel, and only the FINAL turn (the actual answer,
+  // after the last tool call) is promoted to the visible chat when the run
+  // ends. Mid-run narration ("We need to identify the right skill...", fake
+  // tool-call JSON, planning chatter) structurally cannot reach main chat
+  // anymore — it doesn't depend on the model wrapping anything in tags.
+  // Turns are delimited by message id: LangGraph keeps the id stable within
+  // one model turn and changes it on the next.
+  let currentTurnId: string | undefined;
+  let currentTurnContent = "";
+  let lastNonEmptyTurnContent = "";
 
   for await (const [messageChunk, metadata] of agentStream) {
     if (messageChunk?.type !== 'ai') continue;
     if (messageChunk.content) {
-      const text = messageChunk.content;
-      fullContent += text;
+      const text = String(messageChunk.content);
+
+      // Internal model calls (context compaction, browser-output digests) are
+      // still shown — but only in the Thinking panel, and never counted as a
+      // manager turn.
+      const isInternal = ((metadata as any)?.tags ?? []).includes("internal_summary");
+      if (isInternal) {
+        config.writer({
+          manager_name: "nodeB",
+          content: `<think>${text.replace(/<\/?think>/gi, "")}</think>`
+        });
+        continue;
+      }
+
+      const chunkId = (messageChunk as any)?.id;
+      if (chunkId !== currentTurnId) {
+        if (currentTurnContent.trim()) lastNonEmptyTurnContent = currentTurnContent;
+        currentTurnId = chunkId;
+        currentTurnContent = "";
+      }
+      currentTurnContent += text;
 
       config.writer({
         manager_name: "nodeB",
-        content: text
+        content: `<think>${text.replace(/<\/?think>/gi, "")}</think>`
       });
     }
   }
 
-  return fullContent
+  // Promote the final turn (or the last non-empty one, if the run ended on a
+  // tool call) to the visible message. The client's typewriter effect still
+  // animates it, so the UX stays smooth.
+  const finalAnswer = currentTurnContent.trim()
+    ? currentTurnContent
+    : lastNonEmptyTurnContent;
+
+  if (finalAnswer) {
+    config.writer({
+      manager_name: "nodeB",
+      content: finalAnswer
+    });
+  }
+
+  return finalAnswer
   } catch (error: any) {
     lastError = error;
 
