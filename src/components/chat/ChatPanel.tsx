@@ -12,7 +12,7 @@ import ChatInput from "./chatbox/ChatInput";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/store";
 import { useSession } from "next-auth/react";
-import { addAgentFile, addAgentImage, addTodos, addUserAndAiPlaceholder, appendToAssistantThinking, appendToLastAiMessage, appendToLastAIMessageSubAgent, clearTodos, getChatHistory, subAgentWorking, updateTodos } from "@/store/chatSlice";
+import { addAgentFile, addAgentDocument, addAgentImage, addTodos, addUserAndAiPlaceholder, appendToAssistantThinking, appendToLastAiMessage, appendToLastAIMessageSubAgent, clearTodos, getChatHistory, subAgentWorking, updateTodos } from "@/store/chatSlice";
 import { fetchThreads } from "@/store/threadSlice";
 import { ViewReportModal } from "../modal/ViewReportModal";
 
@@ -266,6 +266,11 @@ const typeNext = () => {
             }
 
             // browser_image
+
+            // generated document (pptx/xlsx/docx/pdf)
+            if (data.agent_document !== undefined && data.agent_document !== null) {
+              dispatch(addAgentDocument(data.agent_document))
+            }
 
 
 

@@ -65,6 +65,8 @@ export default function AgentComputer() {
 
   const agentFiles = useSelector((state: any) => state.chat.agent_files);
   const agentImages = useSelector((state: any) => state.chat.agent_images);
+  const agentDocuments = useSelector((state: any) => state.chat.agent_documents);
+  const lastDocIndexRef = useRef(0);
 
   const stopTyping = () => {
     setIsTyping(false);
@@ -167,6 +169,22 @@ export default function AgentComputer() {
       return;
     }
 
+    if (task.type === "document") {
+      setMedia((prev) => {
+        const newMedia = [...prev, task.document];
+        setActiveIndex(newMedia.length - 1);
+        return newMedia;
+      });
+
+      isProcessingQueue.current = false;
+
+      setTimeout(() => {
+        processTaskQueue();
+      }, 400);
+
+      return;
+    }
+
     if (task.type === "file") {
       setMedia((prev) => {
         const newMedia = [...prev, task.file];
@@ -227,6 +245,29 @@ export default function AgentComputer() {
 
   }, [agentImages]);
 
+  useEffect(() => {
+    if (!agentDocuments) return;
+
+    const newDocs = agentDocuments.slice(lastDocIndexRef.current);
+
+    newDocs.forEach((doc: any) => {
+      taskQueueRef.current.push({
+        type: "document",
+        document: {
+          type: "document",
+          name: doc.filename,
+          url: doc.url,
+          kind: doc.kind,
+        }
+      });
+    });
+
+    lastDocIndexRef.current = agentDocuments.length;
+
+    processTaskQueue();
+
+  }, [agentDocuments]);
+
 
   function displayReport(item:{content:string,name:string}){
     if(item.name.includes('.md')){
@@ -257,6 +298,58 @@ export default function AgentComputer() {
             alt="AI Vision"
             className="w-full h-full object-cover animate-in fade-in zoom-in-95 duration-500"
           />
+        </div>
+      );
+    }
+
+    if (item.type === "document") {
+      const kindMeta: Record<string, { label: string; color: string }> = {
+        pptx: { label: "PowerPoint", color: "text-orange-600 bg-orange-50" },
+        xlsx: { label: "Excel", color: "text-green-600 bg-green-50" },
+        docx: { label: "Word", color: "text-blue-600 bg-blue-50" },
+        pdf: { label: "PDF", color: "text-red-600 bg-red-50" },
+      };
+      const meta = kindMeta[item.kind] ?? { label: item.kind?.toUpperCase() ?? "File", color: "text-gray-600 bg-gray-50" };
+
+      return (
+        <div className="flex flex-col h-full w-full animate-in fade-in duration-300">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <div className={cn("p-1.5 rounded-md", meta.color)}>
+                <FileText size={14} />
+              </div>
+              <span className="text-foreground text-sm font-bold">{item.name}</span>
+              <span className={cn("text-[10px] font-bold uppercase px-1.5 py-0.5 rounded", meta.color)}>{meta.label}</span>
+            </div>
+            <a
+              href={item.url}
+              download={item.name}
+              className="flex items-center gap-1 text-[11px] font-bold text-white bg-primary hover:bg-primary/90 px-3 py-1.5 rounded-md transition"
+            >
+              <ExternalLink size={13} /> Download
+            </a>
+          </div>
+
+          <div className="flex-1 overflow-hidden rounded-xl border border-border bg-muted/30">
+            {item.kind === "pdf" ? (
+              <iframe src={item.url} title={item.name} className="w-full h-full" />
+            ) : (
+              <div className="flex flex-col items-center justify-center h-full gap-4 text-muted-foreground">
+                <div className={cn("w-20 h-20 rounded-2xl flex items-center justify-center", meta.color)}>
+                  <FileText size={36} />
+                </div>
+                <p className="text-sm font-medium">{meta.label} document ready</p>
+                <a
+                  href={item.url}
+                  download={item.name}
+                  className="flex items-center gap-2 text-xs font-bold text-white bg-primary hover:bg-primary/90 px-4 py-2 rounded-lg transition"
+                >
+                  <ExternalLink size={14} /> Download {item.name}
+                </a>
+                <p className="text-[11px] text-muted-foreground/70">Preview isn't available for this format — download to open.</p>
+              </div>
+            )}
+          </div>
         </div>
       );
     }

@@ -15,6 +15,7 @@ This folder contains specialized Standard Operating Procedures (SOPs) for comple
 | **brand-guidelines** | `./brand-guidelines/` | Applies Anthropic's official brand colors and typography to artifacts requiring company look-and-feel. |
 | **canvas-design** | `./canvas-design/` | Create beautiful visual art in .png and .pdf documents using design philosophy. |
 | **claude-api** | `./claude-api/` | Build apps with the Claude API or Anthropic SDK (Python, TypeScript, Java, Go, Ruby, cURL, C#, PHP). |
+| **consulting-deliverables** | `./consulting-deliverables/` | Produce real downloadable executive-grade decks, dashboards, reports, and models (.pptx/.pdf/.xlsx/.docx) via generate_pptx/generate_pdf/generate_xlsx/generate_docx. McKinsey-style charts + KPIs. |
 | **doc-coauthoring** | `./doc-coauthoring/` | Guide users through structured workflow for co-authoring documentation, proposals, and technical specs. |
 | **docx** | `./docx/` | Create, read, edit, or manipulate Word documents (.docx files) with formatting and tracked changes. |
 | **flask-app-builder** | `./flask-app-builder/` | Build Flask web applications from scratch (single-file, package-based, or Blueprint architecture). |

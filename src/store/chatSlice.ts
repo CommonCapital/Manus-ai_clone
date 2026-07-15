@@ -24,12 +24,17 @@ export type TodoListType = Array<{ id: string, task: string, status: TodoStatus 
 
 export type AgentFileType = { filename: string, content: string }
 
+// A generated binary document (pptx/xlsx/docx/pdf): no inline text content,
+// just a served URL to download / preview and a kind for the right icon.
+export type AgentDocumentType = { filename: string, url: string, kind: string }
+
 type ChatState = {
   messages: ChatMessage[];
   loading: boolean;
   error: string | null;
   todos: TodoListType
   agent_files: AgentFileType[]
+  agent_documents: AgentDocumentType[]
   agent_images: any[]
 
   // panels
@@ -48,6 +53,7 @@ const initialState: ChatState = {
   messages: [],
   todos: [],
   agent_files: [],
+  agent_documents: [],
   agent_images: [],
   loading: false,
   error: null,
@@ -130,6 +136,15 @@ subAgentWorking(state, action: PayloadAction<boolean>) {
     ) {
       state.chatPanelPadding = "computer"
       state.agent_files.push(action.payload);
+    },
+
+
+    addAgentDocument(
+      state,
+      action: PayloadAction<AgentDocumentType>
+    ) {
+      state.chatPanelPadding = "computer"
+      state.agent_documents.push(action.payload);
     },
 
 
@@ -241,5 +256,5 @@ subAgentWorking(state, action: PayloadAction<boolean>) {
   },
 });
 
-export const { subAgentWorking,toggleViewReportModal,modifyReportModalContent, toggleChatPanelPadding, toggleLeftPanels, clearTodos, addTodos, addAgentFile, addAgentImage, updateTodos, appendToLastAIMessageSubAgent, appendToAssistantThinking, appendToLastAiMessage, addUserAndAiPlaceholder } = chatSlice.actions;
+export const { subAgentWorking,toggleViewReportModal,modifyReportModalContent, toggleChatPanelPadding, toggleLeftPanels, clearTodos, addTodos, addAgentFile, addAgentDocument, addAgentImage, updateTodos, appendToLastAIMessageSubAgent, appendToAssistantThinking, appendToLastAiMessage, addUserAndAiPlaceholder } = chatSlice.actions;
 export default chatSlice.reducer;

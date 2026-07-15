@@ -43,3 +43,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# generated binary documents (runtime output)
+/public/generated/*
+!/public/generated/.gitkeep

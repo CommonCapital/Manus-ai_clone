@@ -26,6 +26,7 @@ import { searchTool, webScrapperTool } from "./searchTool";
 import { fixThinkingTags } from "../helper/fixThinkingTags";
 import { execute_code, run_app, get_app_logs, stop_app } from "./sandboxTool";
 import { take_screenshot } from "./screenshotTool";
+import { documentTools } from "./docTools";
 import { MAX_MODEL_RETRIES, isRateLimitError, sleep, backoffMs } from "./retry";
 import { buildFilesystemTools } from "../memo/tools/fileSystemTools";
 
@@ -63,7 +64,7 @@ const workerModel = LLM.getInstance("fireworks_minimax")
 
 
 const subagentConfigs = {
-  tools: [...filesystemTools, ...todoListTools,
+  tools: [...filesystemTools, ...todoListTools, ...documentTools,
   // ...mcpTools,
     // SendImageToAgentComputer,
     searchTool,
@@ -88,7 +89,7 @@ ${basePrompt}
 ${TASK_SYSTEM_PROMPT}
     </system>
     `,
-    tools: [...filesystemTools, ...todoListTools, execute_code, run_app, get_app_logs, stop_app, take_screenshot, think_tool, createTaskTool(workerModel, subagentConfigs), searchTool, webScrapperTool] as any,
+    tools: [...filesystemTools, ...todoListTools, ...documentTools, execute_code, run_app, get_app_logs, stop_app, take_screenshot, think_tool, createTaskTool(workerModel, subagentConfigs), searchTool, webScrapperTool] as any,
     middleware: [
         summarizationMiddleware({
             // Context compaction runs on the fast worker model (MiniMax), not the

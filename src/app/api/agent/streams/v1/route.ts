@@ -111,17 +111,30 @@ export const POST = withErrorHandler(async (req: Request) => {
                     for await (const [array, chunk] of graphStream) {
 
 
+                        // generated binary document (pptx/xlsx/docx/pdf) — carries a
+                        // served URL for download/preview on the Agent Computer.
+                        if ((chunk as any).agent_document) {
+                            controller.enqueue(sse("agent_document", {
+                                agent_document: {
+                                    filename: chunk?.filename,
+                                    url: chunk?.url,
+                                    kind: chunk?.kind,
+                                }
+                            }));
+                            continue;
+                        }
+
                         // browser_image
                          if ((chunk as any).browser_image) {
                             const browser_image = {
-                                
+
                                 browser_image: chunk?.browser_image,
                                 src: chunk?.src
                             };
                             controller.enqueue(sse("browser_image", {
                                 browser_image
                             }));
-                           
+
                         }
 
 
